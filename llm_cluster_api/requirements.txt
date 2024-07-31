@@ -1,0 +1,4 @@
+typeguard
+pydantic
+fastapi
+requests
