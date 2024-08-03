@@ -1,11 +1,11 @@
 from fastapi import HTTPException
-import requests, os
 from src.providers.base_provider import BaseProvider
+import requests
 
 class OllamaProvider(BaseProvider):
 
-    def __init__(self):
-        self.base_url = os.environ.get('OLLAMA_BASE_URL')
+    def __init__(self, base_url):
+        self.base_url = base_url
 
     def list_models(self) -> str:
         response = requests.get(self.base_url + '/api/tags')
