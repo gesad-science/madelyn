@@ -13,16 +13,18 @@ models_router = APIRouter()
 def get_models():
     return ModelStorage.list_models()
 
-@models_router.get('/models/{model_name}')
-def get_models(model_name : str):
-    return ModelStorage.get_model(model_name).description()
-
 @models_router.get('/models/unregistered')
 def get_unregistered_models():
     all_models = LLMProviderStorage.get_default_provider().list_models()
     for model in ModelStorage.list_models():
-        all_models.remove(model)
+        if model in all_models:
+            all_models.remove(model)
     return all_models
+
+@models_router.get('/models/{model_name}')
+def get_model(model_name : str):
+    return ModelStorage.get_model(model_name).description()
+
 
 @models_router.delete('/models/{model_name}')
 def delete_model(model_name : str):
@@ -32,29 +34,20 @@ def delete_model(model_name : str):
 
 @models_router.post('/models')
 def post_model(model : Model):
-    ModelStorage.add_model(
-        LLModel(
-             
-        )
-    )
-
-    raise NotImplementedError('AJEITA')
-
+    ModelStorage.add_model(model.to_LLModel())
+    return "Ok"
 
 @models_router.put('/models')
 def post_model(model : Model):
     ModelStorage.delete_model(model.name)
-    ModelStorage.add_model(
-        LLModel(
-             
-        )
-    )
-    raise NotImplementedError('AJEITA')
+    ModelStorage.add_model(model.to_LLModel())
+    return "Ok"
+
 
 @models_router.post('/models/{model_name}/query')
 def query(model_name : str, prompt_input : Query):
         ModelStorage.get_model(model_name).run_query(
             inputs={
-                "variables": prompt_input.variables
+                "variables": prompt_input.variables or []
             }
         )

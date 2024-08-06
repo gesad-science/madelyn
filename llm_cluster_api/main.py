@@ -12,3 +12,15 @@ app = FastAPI()
 app.include_router(prompts_router)
 app.include_router(models_router)
 app.include_router(validations_router)
+
+
+"""
+
+    TODO:   
+        - Data verifications over paramethers passed from body
+
+        - Assert validation numbers to be in the correct range (for delete and post endpoints)
+
+        - Adjust redundancy in query endpoint
+
+"""

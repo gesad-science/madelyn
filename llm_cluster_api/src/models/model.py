@@ -1,10 +1,19 @@
-from pydantic import BaseModel
-
 from src.models.prompt import Prompt
+from src.llm.LLModel import LLModel
+from pydantic import BaseModel
+from uuid import uuid4
 
 class Model(BaseModel):
-    name : str
-    main_prompt : Prompt
-    prompt_variaitons : list[Prompt] = []
+    model_name : str
+    default_prompt : Prompt
+    prompt_alternatives : list[Prompt] = []
     validations : list[int] = []
     
+
+    def to_LLModel(self) -> LLModel:
+        return LLModel(
+            model_name= self.model_name,
+            default_prompt= self.default_prompt.to_PromptTemplate(uuid4()),
+            validations= self.validations,
+            prompt_alternatives= [ prompt.to_PromptTemplate(uuid4()) for prompt in self.prompt_alternatives]
+        )

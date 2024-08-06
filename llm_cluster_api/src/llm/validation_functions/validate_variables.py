@@ -10,6 +10,6 @@ def validate_variables(prompt : PromptTemplate, inputs : dict):
         if variable not in prompt.args["variables"]:
             return False
     for variable in prompt.args["variables"]:
-        if variable not in input["variables"]:
+        if variable not in inputs["variables"]:
             return False
     return True

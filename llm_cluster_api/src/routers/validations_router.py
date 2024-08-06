@@ -12,7 +12,7 @@ def get_validations():
 
 @validations_router.get('/models/{model_name}/validations')
 def get_validations_from_model(model_name : str):
-    QueryValidator.list_validations(ModelStorage.get_model(model_name).validations)
+    return QueryValidator.list_validations(ModelStorage.get_model(model_name).validations)
 
 @validations_router.delete('/models/{model_name}/validations/{validation_number}')
 def delete_validations(model_name : str, validation_number : int):
@@ -22,7 +22,7 @@ def delete_validations(model_name : str, validation_number : int):
 
 @validations_router.post('/models/{model_name}/validations/{validation_number}')
 def post_validations(model_name : str, validation_number : int):
-    if ModelStorage.get_model(model_name).add_validation:
+    if ModelStorage.get_model(model_name).add_validation(validation_number):
         return 'Ok'
     raise HTTPException(status_code=400, detail=f"Validation {validation_number} already registered in model {model_name}")
     

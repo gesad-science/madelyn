@@ -1,0 +1,136 @@
+[
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models/unregistered",
+        "body" : {}
+
+
+    },
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models",
+        "body" : {}
+
+
+    },   
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models",
+        "body" : {
+            "model_name": "llama3:latest",
+            "default_prompt": {
+              "template": "Show me some wholesome ways to roast someone",
+              "args": {
+                "variables": []
+              }
+            },
+            "prompt_alternatives": [
+                {
+                    "template": "Tell me 5 different ways to say poo",
+                    "args": {
+                      "variables": []
+                    }
+                }
+            ],
+            "validations": [0]
+          }
+    },    
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models",
+        "body" : {
+            "model_name": "llama3",
+            "default_prompt": {
+              "template": "Tell me step by step a {food} recipe",
+              "args": {
+                "variables": ["food"]
+              }
+            },
+            "prompt_alternatives": [],
+            "validations": [0]
+          }
+    },    
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models/unregistered",
+        "body" : {}
+
+
+    },
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models",
+        "body" : {}
+    }, 
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/validations",
+        "body" : {}
+    },    
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations",
+        "body" : {}
+
+    },    
+    {
+        "method": "DELETE",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/0",
+        "body" : {}
+    },    
+    {
+        "method": "DELETE",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/0",
+        "body" : {}
+    },    
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/0",
+        "body" : {}
+    },  
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/10000",
+        "body" : {}
+    },      
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/0",
+        "body" : {}
+    },    
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models/lama3:latest/validations/10000",
+        "body" : {}
+    },    
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models/llama3:latest/prompts",
+        "body" : {}
+    },   
+    {
+        "method": "GET",
+        "url" : "http://127.0.0.1:8000/models/llama3:latest/prompts/{main_propmt_uid}",
+        "body" : {}
+    },
+    {
+        "method": "DELETE",
+        "url" : "http://127.0.0.1:8000/models/llama3:latest/prompts/{main_prompt_uid}",
+        "body" : {}
+    },
+    {
+        "method": "DELETE",
+        "url" : "http://127.0.0.1:8000/models/llama3:latest/prompts/{alternative_prompt_uid}",
+        "body" : {}
+    },
+    {
+        "method": "POST",
+        "url" : "http://127.0.0.1:8000/models/llama3:latest/prompts",
+        "body" : {
+                "template": "Tell me a horror story about a slimie monster",
+                "args": {
+                    "variables" : []
+            }
+          }
+    }
+]

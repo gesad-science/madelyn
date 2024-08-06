@@ -1,5 +1,5 @@
 from src.llm.prompt_template import PromptTemplate
-from LLM_provider_storage import LLMProviderStorage
+from src.LLM_provider_storage import LLMProviderStorage
 from fastapi import HTTPException
 from uuid import UUID
 from src.llm.query_validator import QueryValidator
@@ -47,7 +47,8 @@ class LLModel():
             return {'logs' : logs }
 
         return {
-            "response" : LLMProviderStorage.get_default_provider().make_call(prompt.apply_input(inputs), self.model_name)
+            "response" : LLMProviderStorage.get_default_provider().make_call(prompt= prompt.apply_input(inputs),
+                                                                             model=self.model_name)
         }
 
     def add_validation(self, validation_id : int):
@@ -57,10 +58,11 @@ class LLModel():
         return False
         
     def remove_validation(self, validation_id : int):
-        size = len(self.validations)
-        self.validations.remove(validation_id)
-        return size == self.validations-1
-
+        if validation_id in self.validations:
+            self.validations.remove(validation_id) 
+            return True
+        return False
+    
     def description(self):
         return {
             "name" : self.model_name,

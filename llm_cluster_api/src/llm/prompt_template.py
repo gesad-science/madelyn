@@ -21,7 +21,7 @@ class PromptTemplate:
             text = text.replace('{'+ variable+ '}', inputs["variables"][variable], 1)
 
 
-        return True
+        return text
 
     def apply_input(self, inputs : dict) -> str:
         constructions = [

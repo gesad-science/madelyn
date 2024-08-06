@@ -41,7 +41,7 @@ class OllamaProvider(BaseProvider):
         if not response.ok:
             raise HTTPException(
                                 status_code=response.status_code,
-                                detail= response.json()['error']
+                                detail= "From provider: " + response.json()['error'] 
                                )
         
         return response.json()['response']
