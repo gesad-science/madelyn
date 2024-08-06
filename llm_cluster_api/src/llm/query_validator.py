@@ -27,7 +27,6 @@ class QueryValidator(ABC):
         validation_funciton : Callable[ [PromptTemplate,dict] , bool]
     ################################################################
 
-
     __validations = [
         ValidationTemplate(
             id=0,
@@ -51,3 +50,20 @@ class QueryValidator(ABC):
                 fails_log.append(cls.__validations[validation_id].error_log)
 
         return fails_log
+        
+
+    @classmethod
+    def list_validations(cls, validations : list[int]):
+        return  [ {
+            "id" : cls.__validations[id].id,
+            "name" : cls.__validations[id].validation_name,
+            "description" : cls.__validations[id].validation_description
+            } for id in validations ]
+    
+    @classmethod
+    def list_all_validations(cls):
+        return cls.list_validations([validation.id for validation in  cls.__validations])
+
+
+
+        

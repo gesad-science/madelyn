@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class BaseProvider(ABC):
     @abstractmethod
-    def list_models(self) -> str:
+    def list_models(self) -> list[str]:
         raise NotImplementedError
     @abstractmethod
     def has_model(self, model : str) -> bool:
