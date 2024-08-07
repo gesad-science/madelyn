@@ -6,9 +6,13 @@ class Prompt(BaseModel):
     template: str
     args : dict
 
+    @classmethod
+    def __validate_args(self, args):
+        return args
+
     def to_PromptTemplate(self, id) -> PromptTemplate:
         return PromptTemplate(
             template=self.template,
-            args = self.args,
+            args = self.__validate_args(self.args),
             id=id
         )

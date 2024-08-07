@@ -41,7 +41,7 @@ class QueryValidator(ABC):
     def validate(cls, prompt: PromptTemplate, inputs : dict, validations : list[int]):
         fails_log = []
         for validation_id in validations:
-            if not 0 <= validation_id < len(cls.__validations):
+            if not cls.is_valid_validation(validation_id):
                 fails_log.append(f"there is no validation with index {validation_id}")
                 continue
 
@@ -64,6 +64,12 @@ class QueryValidator(ABC):
     def list_all_validations(cls):
         return cls.list_validations([validation.id for validation in  cls.__validations])
 
+    @classmethod
+    def list_all_validations(cls):
+        return cls.list_validations([validation.id for validation in  cls.__validations])
 
+    @classmethod
+    def is_valid_validation(cls, validation_id):
+        return 0 <= validation_id < len(cls.__validations)
 
         
