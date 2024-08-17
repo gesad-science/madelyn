@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from src.exceptions.bad_value_exception import BadValueException
 from src.providers.base_provider import BaseProvider
 import requests
 
@@ -10,10 +10,11 @@ class OllamaProvider(BaseProvider):
     def list_models(self) -> str:
         response = requests.get(self.base_url + '/api/tags')
         if not response.ok:
-            raise HTTPException(
-                    status_code=response.status_code,
-                    detail= response.json()['error']
-                    )
+            raise BadValueException(
+                                    detail= f'From Ollama: + {response.json()["error"]}', 
+                                    private=True,
+                                    mask_detail="The server cant connect to the llm provider right now"
+                                    )
 
         json_res = response.json()
 
@@ -39,9 +40,10 @@ class OllamaProvider(BaseProvider):
                                )
 
         if not response.ok:
-            raise HTTPException(
-                                status_code=response.status_code,
-                                detail= "From provider: " + response.json()['error'] 
-                               )
+            raise BadValueException(
+                                    detail= f'From Ollama: + {response.json()["error"]}', 
+                                    private=  True,
+                                    mask_detail="The server cant connect to the llm provider right now"
+                                   )
         
         return response.json()['response']

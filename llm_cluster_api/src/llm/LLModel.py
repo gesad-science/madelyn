@@ -1,12 +1,12 @@
 from src.llm.prompt_template import PromptTemplate
 from src.LLM_provider_storage import LLMProviderStorage
-from fastapi import HTTPException
+from src.exceptions.bad_value_exception import BadValueException
 from uuid import UUID
 from src.llm.query_validator import QueryValidator
 
 class LLModel():
     def __init__(self,
-                 model_name : str,
+                 name : str,
                  default_prompt : PromptTemplate, 
                  prompt_alternatives : list[PromptTemplate] = [], 
                  validations : list[int] = []) -> None:
@@ -14,7 +14,7 @@ class LLModel():
         self.main_prompt = default_prompt
         self.prompt_alternatives = prompt_alternatives
         self.validations = validations
-        self.model_name = model_name
+        self.name = name
 
     def get_prompt(self, prompt_template_uid : UUID = None) -> PromptTemplate:
         if prompt_template_uid == None or prompt_template_uid == self.main_prompt.id: 
@@ -22,13 +22,23 @@ class LLModel():
         for prompt in self.prompt_alternatives:
             if prompt.id == prompt_template_uid:
                 return prompt
-        raise HTTPException(
-            status_code=400,
-            detail= f'cant find prompt alternative f{prompt_template_uid} in {self.model_name}\'s configuration'
-            )
+        raise BadValueException(detail= f'cant find prompt alternative f{prompt_template_uid} in {self.name}\'s configuration')
 
     def add_prompt_alternative(self, prompt_template : PromptTemplate):
         self.prompt_alternatives.append(prompt_template)
+
+    def remove_prompt_alternatives(self, prompt_template_uids : list[UUID]):
+        if self.main_prompt in prompt_template_uids:
+            raise BadValueException(
+                detail="You cant delete the main prompt."
+            )
+
+        for prompt_template_uid in prompt_template_uids:        
+            for index, prompt in enumerate(self.prompt_alternatives):
+                if prompt.id == prompt_template_uid:
+                    self.prompt_alternatives.pop(index)
+                    break
+
 
     def remove_prompt_alternative(self, prompt_template_uid):
         for index, prompt in enumerate(self.prompt_alternatives):
@@ -48,15 +58,39 @@ class LLModel():
 
         return {
             "response" : LLMProviderStorage.get_default_provider().make_call(prompt= prompt.apply_input(inputs),
-                                                                             model=self.model_name)
+                                                                             model=self.name)
         }
+
+    def add_validations(self, validations : list[int]) -> tuple[bool, list[int]]:
+        invalid_ones = QueryValidator.invalid_validations_from(validations)
+        if len(invalid_ones) > 0:
+            raise BadValueException(
+                detail=f'These are not valid validation numbers: {invalid_ones}'
+            )
+
+        for validation in validations:
+            self.validations.append(validation)
+
 
     def add_validation(self, validation_id : int):
         if validation_id not in self.validations:
             self.validations.append(validation_id)
             return True
         return False
-        
+    
+    def remove_validations(self, validations : list[int]):
+        invalid_ones = QueryValidator.invalid_validations_from(validations)
+        if len(invalid_ones) > 0:
+            raise BadValueException(
+                detail=f'These are not valid validation numbers: {invalid_ones}'
+            )
+
+        for validation in validations:
+            if validation in self.validations:
+                self.validations.remove(validation)
+
+
+
     def remove_validation(self, validation_id : int):
         if validation_id in self.validations:
             self.validations.remove(validation_id) 
@@ -65,7 +99,7 @@ class LLModel():
     
     def description(self):
         return {
-            "name" : self.model_name,
+            "name" : self.name,
             "main_prompt_uid": self.main_prompt.id,
             "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
             "validations" : self.validations

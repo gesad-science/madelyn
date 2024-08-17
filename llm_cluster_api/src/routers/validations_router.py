@@ -1,3 +1,4 @@
+from src.decorators.bad_value_check import bad_value_check
 from src.llm.query_validator import QueryValidator
 from fastapi import APIRouter, HTTPException
 from src.model_storage import ModelStorage
@@ -7,28 +8,21 @@ from uuid import UUID
 validations_router = APIRouter()
 
 @validations_router.get('/validations', tags=["Validation"])
+@bad_value_check
 def get_validations():
     return QueryValidator.list_all_validations()
 
-@validations_router.get('/models/{model_name}/validations', tags=["Validation"])
-def get_validations_from_model(model_name : str):
-    return QueryValidator.list_validations(ModelStorage.get_model(model_name).validations)
+@validations_router.get('/models/{name}/validations', tags=["Validation"])
+@bad_value_check
+def get_validations_from_model(name : str):
+    return QueryValidator.list_validations(ModelStorage.get_model(name).validations)
 
-@validations_router.delete('/models/{model_name}/validations/{validation_number}',tags=["Validation" ])
-def delete_validations(model_name : str, validation_number : int):
+@validations_router.put('/models/{name}/validations',tags=["Validation" ])
+@bad_value_check
+def delete_validations(name : str, validations : list[int]):
+    ModelStorage.get_model(name).remove_validations(validations)
 
-    if not QueryValidator.is_valid_validation(validation_number):
-        raise HTTPException(status_code=400, detail=f"there is no validation with index {validation_number}")
-
-    if ModelStorage.get_model(model_name).remove_validation(validation_number):
-        return "Ok"
-    raise HTTPException(status_code=400, detail=f"Couldn't find validation {validation_number} in model {model_name}")
-
-@validations_router.post('/models/{model_name}/validations/{validation_number}', tags=["Validation"])
-def post_validations(model_name : str, validation_number : int):
-    if not QueryValidator.is_valid_validation(validation_number):
-        raise HTTPException(status_code=400, detail=f"there is no validation with index {validation_number}")
-    if ModelStorage.get_model(model_name).add_validation(validation_number):
-        return 'Ok'
-    raise HTTPException(status_code=400, detail=f"Validation {validation_number} already registered in model {model_name}")
-     
+@validations_router.post('/models/{name}/validations', tags=["Validation"])
+@bad_value_check
+def post_validations(name : str, validations : list[int]):
+    ModelStorage.get_model(name).add_validations(validations)

@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from src.exceptions.bad_value_exception import BadValueException
 import requests, os
 from src.providers.base_provider import BaseProvider
 

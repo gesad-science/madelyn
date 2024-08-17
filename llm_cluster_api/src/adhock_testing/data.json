@@ -17,7 +17,7 @@
         "method": "POST",
         "url" : "http://127.0.0.1:8000/models",
         "body" : {
-            "model_name": "llama3:latest",
+            "name": "llama3:latest",
             "default_prompt": {
               "template": "Show me some wholesome ways to roast someone",
               "args": {
@@ -39,7 +39,7 @@
         "method": "POST",
         "url" : "http://127.0.0.1:8000/models",
         "body" : {
-            "model_name": "llama3",
+            "name": "llama3",
             "default_prompt": {
               "template": "Tell me step by step a {food} recipe",
               "args": {

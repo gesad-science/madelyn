@@ -20,7 +20,7 @@ class PromptTemplate:
         for _, variable in variables:
             text = text.replace('{'+ variable+ '}', inputs["variables"][variable], 1)
 
-
+        print(text)
         return text
 
     def apply_input(self, inputs : dict) -> str:
