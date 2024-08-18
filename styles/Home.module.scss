@@ -1,0 +1,171 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: rgb(248, 253, 255);
+
+
+    form{
+        width: 500px;
+        height: 500px;
+        margin-right: 1rem;
+        text-align: center;
+        border-radius: 0.8rem;
+        margin-left: 5rem;
+        padding: 1rem;
+        background: rgb(194, 215, 255);
+
+
+    textarea {
+        resize: none;
+    }
+
+    button {
+        padding: 0.8rem;
+        width: 40%;
+        background: rgb(195, 255, 56);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: filter 0.2s;
+
+        &:hover{
+            filter: brightness(0.9);
+        }
+    }
+
+    }
+
+    .caixaapps{
+        padding: 1rem;
+        background: rgb(194, 215, 255);
+        text-align: center;
+        border-radius: 0.9rem;
+        margin-left: 5rem;
+        overflow: auto;
+        height: 800px;
+    
+    input{
+        width: 95%;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border: 1px rgba(0,0,0,0.137);
+        border-radius: 0.6;
+        
+    }
+    .divapps {
+        background-color: #fff; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        margin-bottom: 20px; 
+        padding: 15px; 
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .NomeApp {
+        font-weight: bold;
+        font-size: 1.5em;
+        padding: 0rem 0rem;
+
+      }
+
+      .DescricaoAPP {
+        font-size: 1.0rem;
+        text-align: left;
+        padding: 0rem 0rem;
+      }
+      
+      .editar, .excluir {
+        margin-left: 10px; /* Espaçamento entre os botões */
+      }
+      
+      .caixaapps {
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #E0E7FF; /* Ajuste na cor de fundo */  
+    
+    }
+    
+   
+    .boxedit{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        div{
+            margin: 1rem;
+        }
+
+        button{
+            padding: 0.3rem;
+            background: rgb(255, 255, 255);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: filter 0.2s;
+            margin-left: 0.5rem;
+            border: 0.1rem solid rgb(228, 227, 227);
+
+            &:hover{
+                filter: brightness(0.9);
+            }
+        }
+    
+    
+    .editar{
+            color: rgb(0, 0, 0);
+        }
+
+    .excluir{
+            background: rgb(255, 74, 74);
+        }
+    }
+
+    }
+
+    .DescricaoAPP{
+        padding: 0.5rem 1.5rem;
+
+        p{
+            margin: 0;
+        }
+        
+    }
+
+    .actionBar {
+        display: flex;
+        align-items: center; 
+        justify-content: center;
+        margin-top: 0.2rem;
+
+        button {
+            margin-left: 30rem;
+            margin-right: 0.8rem;
+            align-self: center;
+        }
+
+        h1 {
+            margin-left: 0.5rem;
+        }
+
+        .novo {
+            padding: 0.5rem;
+            background: rgb(43, 219, 27);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: filter 0.2s;
+    
+            &:hover{
+                filter: brightness(0.9);
+            }
+        }
+
+
+      }
+      
+
+}
+
+
