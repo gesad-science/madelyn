@@ -1,7 +1,7 @@
 from src.llm.query_validator import QueryValidator
 from src.models.prompt import Prompt
 from src.llm.LLModel import LLModel
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 from pydantic import BaseModel
 from uuid import uuid4
 
@@ -17,7 +17,7 @@ class Model(BaseModel):
             if not QueryValidator.is_valid(validation):
                 illegal_validations.append(validation)
         if len(illegal_validations) > 0:
-            raise BadValueException(detail=f"These are not valid validation numbers {illegal_validations}")
+            raise BusinessRuleException(detail=f"These are not valid validation numbers {illegal_validations}")
 
         return LLModel(
             name= self.name,

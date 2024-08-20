@@ -1,6 +1,6 @@
 from src.llm.prompt_template import PromptTemplate
 from src.LLM_provider_storage import LLMProviderStorage
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 from uuid import UUID
 from src.llm.query_validator import QueryValidator
 
@@ -22,14 +22,14 @@ class LLModel():
         for prompt in self.prompt_alternatives:
             if prompt.id == prompt_template_uid:
                 return prompt
-        raise BadValueException(detail= f'cant find prompt alternative f{prompt_template_uid} in {self.name}\'s configuration')
+        raise BusinessRuleException(detail= f'cant find prompt alternative f{prompt_template_uid} in {self.name}\'s configuration')
 
     def add_prompt_alternative(self, prompt_template : PromptTemplate):
         self.prompt_alternatives.append(prompt_template)
 
     def remove_prompt_alternatives(self, prompt_template_uids : list[UUID]):
         if self.main_prompt in prompt_template_uids:
-            raise BadValueException(
+            raise BusinessRuleException(
                 detail="You cant delete the main prompt."
             )
 
@@ -64,7 +64,7 @@ class LLModel():
     def add_validations(self, validations : list[int]) -> tuple[bool, list[int]]:
         invalid_ones = QueryValidator.invalid_validations_from(validations)
         if len(invalid_ones) > 0:
-            raise BadValueException(
+            raise BusinessRuleException(
                 detail=f'These are not valid validation numbers: {invalid_ones}'
             )
 
@@ -81,7 +81,7 @@ class LLModel():
     def remove_validations(self, validations : list[int]):
         invalid_ones = QueryValidator.invalid_validations_from(validations)
         if len(invalid_ones) > 0:
-            raise BadValueException(
+            raise BusinessRuleException(
                 detail=f'These are not valid validation numbers: {invalid_ones}'
             )
 
@@ -111,3 +111,15 @@ class LLModel():
             "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
         }
 
+
+    def swap_prompt_for_alternative(self, prompt_uid):
+        if self.main_prompt.id == prompt_uid:
+            raise BusinessRuleException(detail="You are trying to swap the main prompt by itself")
+        prompt = self.get_prompt(prompt_uid)
+
+        self.remove_prompt_alternative(prompt.id)
+
+        main_prompt = self.main_prompt
+        self.main_prompt = prompt
+        self.add_prompt_alternative(main_prompt)
+        

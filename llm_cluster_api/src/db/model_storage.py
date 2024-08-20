@@ -1,6 +1,6 @@
 from src.llm.LLModel import LLModel
 from abc import ABC
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 
 class ModelStorage(ABC):
     __models : list[LLModel] = []
@@ -11,7 +11,7 @@ class ModelStorage(ABC):
         for model in cls.__models:
             if model.name == name:
                 return model
-        raise BadValueException(detail=f"{name} is not a registered model")
+        raise BusinessRuleException(detail=f"{name} is not a registered model")
         
     
     @classmethod
@@ -27,7 +27,7 @@ class ModelStorage(ABC):
     def add_model(cls, model : LLModel):
         for m in cls.__models:
             if m.name == model.name:
-                raise BadValueException(detail=f"{model.name} is already registered")
+                raise BusinessRuleException(detail=f"{model.name} is already registered")
         cls.__models.append(model)
     
     @classmethod

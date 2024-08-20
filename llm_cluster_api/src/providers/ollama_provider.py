@@ -1,4 +1,4 @@
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 from src.providers.base_provider import BaseProvider
 import requests
 
@@ -10,7 +10,7 @@ class OllamaProvider(BaseProvider):
     def list_models(self) -> str:
         response = requests.get(self.base_url + '/api/tags')
         if not response.ok:
-            raise BadValueException(
+            raise BusinessRuleException(
                                     detail= f'From Ollama: + {response.json()["error"]}', 
                                     private=True,
                                     mask_detail="The server cant connect to the llm provider right now"
@@ -40,7 +40,7 @@ class OllamaProvider(BaseProvider):
                                )
 
         if not response.ok:
-            raise BadValueException(
+            raise BusinessRuleException(
                                     detail= f'From Ollama: + {response.json()["error"]}', 
                                     private=  True,
                                     mask_detail="The server cant connect to the llm provider right now"

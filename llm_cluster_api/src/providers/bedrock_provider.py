@@ -1,4 +1,4 @@
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 import requests, os
 from src.providers.base_provider import BaseProvider
 

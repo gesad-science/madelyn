@@ -3,22 +3,22 @@ from fastapi import APIRouter, HTTPException
 from src.model_storage import ModelStorage
 from src.llm.LLModel import LLModel
 from uuid import UUID
-from src.exceptions.bad_value_exception import BadValueException
+from exceptions.business_rule_exception import BusinessRuleException
 
 from src.models.model import Model
 from src.models.query import Query
 
-from src.decorators.bad_value_check import bad_value_check
+from src.decorators.business_rule_exception_check import business_rule_exception_check
 
 models_router = APIRouter()
 
 @models_router.get('/models', tags=["Model" ])
-@bad_value_check
+@business_rule_exception_check
 def get_models():
         return ModelStorage.list_models()
 
 @models_router.get('/models/unregistered', tags=["Model" ])
-@bad_value_check
+@business_rule_exception_check
 def get_unregistered_models():
     all_models = LLMProviderStorage.get_default_provider().list_models()
     for model in ModelStorage.list_models():
@@ -27,33 +27,33 @@ def get_unregistered_models():
     return all_models
 
 @models_router.get('/models/{name}', tags=["Model" ])
-@bad_value_check
+@business_rule_exception_check
 def get_model(name : str):
     return ModelStorage.get_model(name).description()
 
 
 @models_router.delete('/models/{name}', tags=["Model" ])
-@bad_value_check
+@business_rule_exception_check
 def delete_model(name : str):
     if not ModelStorage.delete_model(name):
         raise HTTPException(status_code=404, detail=f"{name} is not a registered model")
     return "Ok"
 
 @models_router.post('/models', tags=["Model" ])
-@bad_value_check
+@business_rule_exception_check
 def post_model(model : Model):
     ModelStorage.add_model(model.to_LLModel())
     return "Ok"
 
 @models_router.put('/models', tags=["Model"])
-@bad_value_check
+@business_rule_exception_check
 def put_model(model : Model):
     ModelStorage.delete_model(model.name)
     ModelStorage.add_model(model.to_LLModel())
     return "Ok"
 
 @models_router.post('/models/{name}/query', tags=["Query"])
-@bad_value_check
+@business_rule_exception_check
 def query(name : str, prompt_input : Query):
         return ModelStorage.get_model(name).run_query(
             inputs={
