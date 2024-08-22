@@ -1,7 +1,7 @@
 from src.decorators.business_rule_exception_check import business_rule_exception_check
 from src.llm.query_validator import QueryValidator
 from fastapi import APIRouter, HTTPException
-from src.model_storage import ModelStorage
+from db.model_storage import ModelStorage
 from uuid import UUID
 
 

@@ -1,6 +1,6 @@
 from src.LLM_provider_storage import LLMProviderStorage
 from fastapi import APIRouter, HTTPException
-from src.model_storage import ModelStorage
+from db.model_storage import ModelStorage
 from src.llm.LLModel import LLModel
 from uuid import UUID
 from exceptions.business_rule_exception import BusinessRuleException

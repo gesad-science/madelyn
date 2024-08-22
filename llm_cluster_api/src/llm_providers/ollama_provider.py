@@ -1,5 +1,5 @@
 from exceptions.business_rule_exception import BusinessRuleException
-from src.providers.base_provider import BaseProvider
+from src.llm_providers.base_provider import BaseProvider
 import requests
 
 class OllamaProvider(BaseProvider):

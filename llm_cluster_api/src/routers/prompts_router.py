@@ -1,6 +1,6 @@
 from src.decorators.business_rule_exception_check import business_rule_exception_check
 from fastapi import APIRouter, HTTPException
-from src.model_storage import ModelStorage
+from db.model_storage import ModelStorage
 from src.models.prompt import Prompt
 from uuid import UUID
 import uuid

@@ -2,3 +2,4 @@ typeguard
 pydantic
 fastapi
 requests
+python-arango

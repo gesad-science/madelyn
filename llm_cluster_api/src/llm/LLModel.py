@@ -39,7 +39,6 @@ class LLModel():
                     self.prompt_alternatives.pop(index)
                     break
 
-
     def remove_prompt_alternative(self, prompt_template_uid):
         for index, prompt in enumerate(self.prompt_alternatives):
             if prompt.id == prompt_template_uid:

@@ -1,6 +1,6 @@
-from src.providers.base_provider import BaseProvider
-from src.providers.ollama_provider import OllamaProvider
-from src.providers.bedrock_provider import BedrockProvider
+from src.llm_providers.base_provider import BaseProvider
+from src.llm_providers.ollama_provider import OllamaProvider
+from src.llm_providers.bedrock_provider import BedrockProvider
 from abc import ABC
 import os
 
