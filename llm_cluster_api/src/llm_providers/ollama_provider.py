@@ -1,4 +1,5 @@
-from exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.business_rule_exception import BusinessRuleException
+
 from src.llm_providers.base_provider import BaseProvider
 import requests
 

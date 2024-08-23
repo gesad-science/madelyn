@@ -23,5 +23,5 @@ class LLMProviderStorage(ABC):
     
     @classmethod
     def get_default_provider(cls) -> BaseProvider:
-        return cls.__providers[cls.__default]
+        return cls.get_provider(cls.__default)
 

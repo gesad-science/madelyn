@@ -1,7 +1,8 @@
 from src.llm.query_validator import QueryValidator
 from src.models.prompt import Prompt
 from src.llm.LLModel import LLModel
-from exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.business_rule_exception import BusinessRuleException
+
 from pydantic import BaseModel
 from uuid import uuid4
 

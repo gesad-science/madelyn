@@ -1,6 +1,7 @@
 from src.llm.LLModel import LLModel
 from abc import ABC
-from exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.business_rule_exception import BusinessRuleException
+
 
 class ModelStorage(ABC):
     __models : list[LLModel] = []

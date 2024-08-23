@@ -42,19 +42,19 @@
 
     > Endpoint that provides more specific information about a specific prompt
 
-- DELETE /model{name}/prompts/{prompt_uid}
+- PUT /model{name}/prompts/
 
-    > Endpoint that deletes a specific prompt template
+    > Endpoint that deletes a list of prompt templates
 
 - POST /model{name}/prompts/
 
     > Endpoint that adds a provided prompt, from body by the way, to the prompt alternatives list of a model
 
-- PUT /model{name}/prompts/{prompt_uid}
+- PUT /model{name}/prompts/main/{prompt_uid}
 
     > Endpoint that swaps the main prompt of a model with the specified prompt. The prompt needs to be registered as an prompt alternative
 
-- PUT /model{name}/prompts/
+- PUT /model{name}/prompts/main
 
     > Endpoint that swaps the main prompt of a model with the prompt specified at the request body. It results in the exclusion of the older main prompt
 
@@ -71,10 +71,10 @@
     > Endpoint that provides a list of all validations registered to a specified model
 
 
-- DELETE /models/{name}/validations/{validation_number}
+- PUT /models/{name}/validations/
 
-    > Endpoint that provides erases a specified validation from a also specified model. If it isn't registered, returns bad request
+    > Endpoint that erases a list of validations from a also specified model.
 
 - POST /models/{name}/validations/{validation_number}
 
-    > Endpoint that provides adds a specified validation from a also specified model. If it is already registered, returns bad request
+    > Endpoint that adds a list of validations to specified model

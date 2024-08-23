@@ -1,4 +1,5 @@
-from exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.business_rule_exception import BusinessRuleException
+
 from src.utils.singleton import Singleton
 from src.llm.LLModel import LLModel
 from src.llm.prompt_template import PromptTemplate
@@ -65,7 +66,7 @@ class ArangoModelStorage():
     def __arango_doc_to_LLModel(arango_doc : dict) -> LLModel:
         return LLModel(
             name = arango_doc["_key"],
-            main_prompt=  ArangoModelStorage.__arango_doc_to_PromptTemplate(arango_doc["main_prompt"]),
+            default_prompt=  ArangoModelStorage.__arango_doc_to_PromptTemplate(arango_doc["main_prompt"]),
             prompt_alternatives=[ ArangoModelStorage.__arango_doc_to_PromptTemplate(p) 
                                   for p in arango_doc["prompt_alternatives"]],
             validations = arango_doc["validations"]
@@ -80,7 +81,7 @@ class ArangoModelStorage():
         }
 
     @staticmethod
-    def __LLModel_to_arango_doc(self, model : LLModel) -> dict:
+    def __LLModel_to_arango_doc(model : LLModel) -> dict:
         return {
             "_key": model.name,
             "main_prompt": ArangoModelStorage.__PromptTemplate_to_arango_doc(model.main_prompt),

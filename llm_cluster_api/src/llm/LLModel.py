@@ -1,6 +1,7 @@
 from src.llm.prompt_template import PromptTemplate
 from src.LLM_provider_storage import LLMProviderStorage
-from exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.business_rule_exception import BusinessRuleException
+
 from uuid import UUID
 from src.llm.query_validator import QueryValidator
 
