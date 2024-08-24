@@ -1,0 +1,17 @@
+#Dockerfile app
+
+FROM python:3.10.12
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["/bin/sh", "-c", "sleep 20 && curl -X POST http://arangodb-instance:8529/_db/_system/_api/database -H 'Content-Type: application/json' -u root:123 -d '{\"name\": \"madelyn_model_storage_database\"}' && fastapi dev main.py", "--host", "0.0.0.0", "--port", "8000"]
+

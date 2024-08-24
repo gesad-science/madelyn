@@ -3,3 +3,4 @@ pydantic
 fastapi
 requests
 python-arango
+fastapi[standard]

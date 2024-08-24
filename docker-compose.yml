@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:  
+  arangodb:
+    image: arangodb
+    container_name: arangodb-instance
+    environment:
+      - ARANGO_ROOT_PASSWORD=123
+    ports:
+      - "8529:8529"
+    volumes:
+      - arangodb-data:/var/lib/arangodb3
+    restart: always
+  
+  curl:
+    image: rapidfort/curl
+    command: ["/bin/sh", "-c", "sleep 10 && curl -X POST http://arangodb-instance:8529/_db/_system/_api/database -H 'Content-Type: application/json' -u root:123 -d '{\"name\": \"madelyn_model_storage_database\"}'"]
+    depends_on:
+      - arangodb
+
+  api:
+    build: 
+      context: ./llm_cluster_api
+      dockerfile: Dockerfile-API
+    environment:
+      - ARANGODB_URL=http://arangodb-instance:8529
+      - ARANGODB_USERNAME=root
+      - ARANGODB_PASSWORD=123
+    ports:
+      - "8000:8000"
+    depends_on:
+      - arangodb
+    restart: always
+volumes: 
+  arangodb-data:
