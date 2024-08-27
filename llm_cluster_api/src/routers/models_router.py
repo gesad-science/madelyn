@@ -20,7 +20,7 @@ def get_models():
 @business_rule_exception_check
 def get_unregistered_models():
     all_models = LLMProviderStorage.get_default_provider().list_models()
-    print("passed")
+    print("Nothing")
     for model in ArangoModelStorage().list_models():
         if model in all_models:
             all_models.remove(model)

@@ -4,3 +4,4 @@ fastapi
 requests
 python-arango
 fastapi[standard]
+ollama

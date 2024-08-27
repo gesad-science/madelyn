@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:  
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    container_name: ollama
+    volumes:
+      - ollama:/root/.ollama
+    command: "serve"
+    # restart: always
+
+
   arangodb:
     build:
       context: ./llm_cluster_api
@@ -20,10 +31,15 @@ services:
       - ARANGODB_URL=http://arangodb-instance:8529
       - ARANGODB_USERNAME=root
       - ARANGODB_PASSWORD=123
+      - OLLAMA_BASE_URL=http://ollama:11434
+
     ports:
       - "8000:8000"
     depends_on:
       - arangodb
+      - ollama  
     restart: always
 volumes: 
   arangodb-data:
+  ollama:
+  
