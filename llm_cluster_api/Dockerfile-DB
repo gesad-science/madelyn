@@ -1,0 +1,8 @@
+FROM arangodb
+
+RUN apk update && apk add --no-cache curl
+
+EXPOSE 8529
+
+ENTRYPOINT ["/bin/sh", "-c", "arangod --database.password '123' & sleep 5 && curl -X POST http://0.0.0.0:8529/_db/_system/_api/database -H 'Content-Type: application/json' -u root:123 -d '{\"name\": \"madelyn_model_storage_database\"}' && echo 'database created' && wait"]
+
