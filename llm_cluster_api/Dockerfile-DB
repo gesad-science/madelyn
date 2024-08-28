@@ -1,4 +1,4 @@
-FROM arangodb
+FROM arangodb:3.12.2
 
 RUN apk update && apk add --no-cache curl
 
