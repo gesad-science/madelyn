@@ -1,0 +1,6 @@
+typeguard==4.3.0
+pydantic==2.8.2
+requests==2.32.3
+python-arango==8.1.0
+fastapi[standard]==0.112.1
+ollama==0.3.2
