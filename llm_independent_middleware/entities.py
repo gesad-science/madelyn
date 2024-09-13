@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 from uuid import UUID
 
+from validations import * 
+
 @dataclass
 class Treatmentinputs:
     key : str
@@ -69,4 +71,18 @@ class PromptValidation:
 class PromptValidationCenter:
 
     # A list where all PromptValidations are going to be registered
-    PromptValidations : list[PromptValidation]
+    PromptValidations : list[PromptValidation] = [
+            PromptValidation(prompt_validation_id=1, name='length_validation', description='checks if the answer size is greater than 0', operation=len_test),
+            PromptValidation(prompt_validation_id=2, name='key_equal_value_validation', description='checks if the answer is equal to the key', operation=key_test),
+            PromptValidation(prompt_validation_id=3, name='and_validation', description='checks if the answer contains an addition mark', operation=and_test),
+            PromptValidation(prompt_validation_id=4, name='att_validation', description='checks if the answer is equal to some processed key', operation=att_test)
+
+    ]
+
+
+    @classmethod
+    def get_validation_by_id(cls, id : int) :
+        for pv in cls.PromptValidations:
+            if pv.prompt_validation_id == id:
+                return pv
+        return None

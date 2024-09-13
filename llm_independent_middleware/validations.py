@@ -1,15 +1,15 @@
-from entities import Promptvalidation, Treatmentinput
+# from entities import Promptvalidation, Treatmentinput
 
-def validation_by_id(id : int) -> Promptvalidation:
-    match id:
-        case 1:
-            return PromptValidation(prompt_validation_id=1, name='length_validation', description='checks if the answer size is greater than 0', operation=len_test)
-        case 2:
-            return PromptValidation(prompt_validation_id=2, name='key_equal_value_validation', description='checks if the answer is equal to the key', operation=key_test)
-        case 3:
-            return PromptValidation(prompt_validation_id=3, name='and_validation', description='checks if the answer contains an addition mark', operation=and_test)
-        case 4:
-             return PromptValidation(prompt_validation_id=4, name='att_validation', description='checks if the answer is equal to some processed key', operation=att_test)
+# def validation_by_id(id : int) -> Promptvalidation:
+#     match id:
+#         case 1:
+#             return PromptValidation(prompt_validation_id=1, name='length_validation', description='checks if the answer size is greater than 0', operation=len_test)
+#         case 2:
+#             return PromptValidation(prompt_validation_id=2, name='key_equal_value_validation', description='checks if the answer is equal to the key', operation=key_test)
+#         case 3:
+#             return PromptValidation(prompt_validation_id=3, name='and_validation', description='checks if the answer contains an addition mark', operation=and_test)
+#         case 4:
+#              return PromptValidation(prompt_validation_id=4, name='att_validation', description='checks if the answer is equal to some processed key', operation=att_test)
 
 
 
