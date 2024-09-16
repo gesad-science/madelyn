@@ -19,12 +19,9 @@ def get_models():
 @models_router.get('/models/unregistered', tags=["Model" ])
 @business_rule_exception_check
 def get_unregistered_models():
-    all_models = LLMProviderStorage.get_default_provider().list_models()
-    print("Nothing")
-    for model in ArangoModelStorage().list_models():
-        if model in all_models:
-            all_models.remove(model)
-    return all_models
+    all_models = set(LLMProviderStorage.list_all_models())
+    registered_models= set(ArangoModelStorage().list_models())
+    return list(all_models - registered_models)
 
 @models_router.get('/models/{name}', tags=["Model" ])
 @business_rule_exception_check
@@ -42,7 +39,7 @@ def delete_model(name : str):
 @models_router.post('/models', tags=["Model" ])
 @business_rule_exception_check
 def post_model(model : Model):
-    if LLMProviderStorage.get_default_provider().has_model(model.name):
+    if LLMProviderStorage.has_model(model.name):
         ArangoModelStorage().add_model(model.to_LLModel())
         return "Ok"
 
@@ -51,6 +48,8 @@ def post_model(model : Model):
 @models_router.put('/models', tags=["Model"])
 @business_rule_exception_check
 def put_model(model : Model):
+    if not LLMProviderStorage.has_model(model=model.name):
+         raise HTTPException(detail=f"Cant find {model.name} in any providers", status_code=400)
     ArangoModelStorage().update_model(model.to_LLModel())
     return "Ok"
 

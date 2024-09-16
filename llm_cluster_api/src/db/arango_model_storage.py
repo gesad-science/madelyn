@@ -1,11 +1,10 @@
+from arango import ArangoClient, DocumentDeleteError, DocumentUpdateError, DocumentInsertError
 from src.exceptions.business_rule_exception import BusinessRuleException
-
+from src.llm.prompt_template import PromptTemplate
 from src.utils.singleton import Singleton
 from src.llm.LLModel import LLModel
-from src.llm.prompt_template import PromptTemplate
-from arango import ArangoClient, DocumentDeleteError, DocumentUpdateError, DocumentInsertError
-import os
 from uuid import UUID
+import os
 
 """
 Acourding to a fast research pyarango is not thread safe by default, so

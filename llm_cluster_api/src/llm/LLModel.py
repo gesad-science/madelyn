@@ -57,7 +57,7 @@ class LLModel():
             return {'logs' : logs }
 
         return {
-            "response" : LLMProviderStorage.get_default_provider().make_call(prompt= prompt.apply_input(inputs),
+            "response" : LLMProviderStorage.get_provider_with_model(self.name).make_call(prompt= prompt.apply_input(inputs),
                                                                              model=self.name)
         }
 
@@ -88,8 +88,6 @@ class LLModel():
         for validation in validations:
             if validation in self.validations:
                 self.validations.remove(validation)
-
-
 
     def remove_validation(self, validation_id : int):
         if validation_id in self.validations:

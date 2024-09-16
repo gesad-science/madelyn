@@ -20,10 +20,7 @@ class OllamaProvider(BaseProvider):
 
         print("pulling ended")
 
-
-
     def list_models(self) -> str:
-        print("HAHAHA")
         response = requests.get(self.base_url + '/api/tags')
         if not response.ok:
             raise BusinessRuleException(
