@@ -1,3 +1,5 @@
+from entities import Treatmentinput
+
 # from entities import Promptvalidation, Treatmentinput
 
 # def validation_by_id(id : int) -> Promptvalidation:

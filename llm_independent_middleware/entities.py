@@ -4,6 +4,9 @@ from uuid import UUID
 
 from validations import * 
 
+from madelyn.llm_cluster_api.src.db.model_storage import ModelStorage
+from madelyn.llm_cluster_api.src.llm.LLModel import LLModel
+
 @dataclass
 class Treatmentinputs:
     key : str
@@ -51,7 +54,41 @@ class TreatmentCenter:
             "att_pipeline" : (...)
         }   
     """
-    treatment_lines : dict[str, tuple[ list[TreatmentId], list[PromptValidationId]  ]]
+    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]]
+
+    @classmethod
+    def get_treatment_by_id(cls, id : int):
+
+        for mt in cls.mandatory_treatments:
+            if mt.treatment_id == id:
+                return mt
+        for tl in cls.treatment_lines: 
+            if tl.treatment_id == id:
+                return tl
+        return None
+
+    @classmethod
+    def run_line(cls, line_name : str, input : Treatmentinput):
+
+        pipeline = cls.treatment_lines[line_name]
+        
+        # executing mandatory treatments
+        for treatment in cls.mandatory_treatments:
+            input = treatment(input)
+        
+
+        # executing regular treatments and validations for each model
+        for model in ModelStorage.list_models():
+            for treatment in pipeline[0]:
+                for validation in line[1]:
+                    if validation:
+                        return new_input
+                new_input = treatment(input, model)
+
+        # if not work return the input only with the mandatory treatments
+        return input
+            
+
 
 
 @dataclass
