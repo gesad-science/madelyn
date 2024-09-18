@@ -13,12 +13,8 @@ class OllamaProvider(BaseProvider):
 
         c = Client(host=base_url)
 
-        print("pulling")
-
         c.pull("llama3")
         c.pull("phi3")
-
-        print("pulling ended")
 
     def list_models(self) -> str:
         response = requests.get(self.base_url + '/api/tags')
