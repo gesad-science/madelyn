@@ -74,7 +74,7 @@ class TreatmentCenter:
         
         # executing mandatory treatments
         for treatment in cls.mandatory_treatments:
-            input = treatment(input)
+            input = treatment(input, '') # passing empty as model, mandatory treatments should not request a model
         
 
         # executing regular treatments and validations for each model
