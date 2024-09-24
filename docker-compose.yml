@@ -9,7 +9,7 @@ services:
     volumes:
       - ollama:/root/.ollama
     command: "serve"
-    # restart: always
+    restart: always
 
 
   arangodb:

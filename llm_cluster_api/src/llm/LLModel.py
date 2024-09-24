@@ -16,7 +16,15 @@ class LLModel():
         self.prompt_alternatives = prompt_alternatives
         self.validations = validations
         self.name = name
-
+    
+    def description(self):
+        return {
+            "name" : self.name,
+            "main_prompt_uid": self.main_prompt.id,
+            "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
+            "validations" : self.validations
+        }    
+    
     def get_prompt(self, prompt_template_uid : UUID = None) -> PromptTemplate:
         if prompt_template_uid == None or prompt_template_uid == self.main_prompt.id: 
             return self.main_prompt
@@ -47,20 +55,24 @@ class LLModel():
                 return True
             
         return False
- 
-    def run_query(self, inputs : dict, prompt_template_uid : UUID = None):
-        prompt = self.get_prompt(prompt_template_uid)
 
-        logs = QueryValidator.validate(prompt, inputs, self.validations)
-
-        if len(logs) != 0:
-            return {'logs' : logs }
-
+    def list_prompts(self):
         return {
-            "response" : LLMProviderStorage.get_provider_with_model(self.name).make_call(prompt= prompt.apply_input(inputs),
-                                                                             model=self.name)
+            "main_prompt_uid": self.main_prompt.id,
+            "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
         }
 
+    def swap_prompt_for_alternative(self, prompt_uid):
+        if self.main_prompt.id == prompt_uid:
+            raise BusinessRuleException(detail="You are trying to swap the main prompt by itself")
+        prompt = self.get_prompt(prompt_uid)
+
+        self.remove_prompt_alternative(prompt.id)
+
+        main_prompt = self.main_prompt
+        self.main_prompt = prompt
+        self.add_prompt_alternative(main_prompt)
+        
     def add_validations(self, validations : list[int]) -> tuple[bool, list[int]]:
         invalid_ones = QueryValidator.invalid_validations_from(validations)
         if len(invalid_ones) > 0:
@@ -70,7 +82,6 @@ class LLModel():
 
         for validation in validations:
             self.validations.append(validation)
-
 
     def add_validation(self, validation_id : int):
         if validation_id not in self.validations:
@@ -94,30 +105,17 @@ class LLModel():
             self.validations.remove(validation_id) 
             return True
         return False
-    
-    def description(self):
+
+    def run_question_awnser_query(self, inputs : dict, prompt_template_uid : UUID = None):
+        prompt = self.get_prompt(prompt_template_uid)
+
+        logs = QueryValidator.validate(prompt, inputs, self.validations)
+
+        if len(logs) != 0:
+            return {'logs' : logs }
+
         return {
-            "name" : self.name,
-            "main_prompt_uid": self.main_prompt.id,
-            "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
-            "validations" : self.validations
-        }    
-    
-    def list_prompts(self):
-        return {
-            "main_prompt_uid": self.main_prompt.id,
-            "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
+            "response" : LLMProviderStorage.get_provider_with_model(self.name).make_question_awnser_call(prompt= prompt.apply_input(inputs),
+                                                                             model=self.name)
         }
-
-
-    def swap_prompt_for_alternative(self, prompt_uid):
-        if self.main_prompt.id == prompt_uid:
-            raise BusinessRuleException(detail="You are trying to swap the main prompt by itself")
-        prompt = self.get_prompt(prompt_uid)
-
-        self.remove_prompt_alternative(prompt.id)
-
-        main_prompt = self.main_prompt
-        self.main_prompt = prompt
-        self.add_prompt_alternative(main_prompt)
-        
+    

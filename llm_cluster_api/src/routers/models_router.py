@@ -56,7 +56,7 @@ def put_model(model : Model):
 @models_router.post('/models/{name}/query', tags=["Query"])
 @business_rule_exception_check
 def query(name : str, prompt_input : Query):
-        return ArangoModelStorage().get_model(name).run_query(
+        return ArangoModelStorage().get_model(name).run_question_awnser_query(
             inputs={
                 "variables": prompt_input.variables or []
             }
