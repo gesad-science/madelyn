@@ -9,10 +9,8 @@ class BaseProvider(ABC):
     def has_model(self, model : str) -> bool:
         raise NotImplementedError()
     
-
-
     @abstractmethod
-    def capabilities_of(self, model : str) -> list[LLMCapabilities] | None:
+    def get_capabilities_of(self, model : str) -> list[LLMCapabilities] | None:
         raise NotImplementedError()
 
     @abstractmethod

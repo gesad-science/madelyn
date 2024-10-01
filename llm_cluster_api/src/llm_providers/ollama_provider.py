@@ -28,7 +28,7 @@ class OllamaProvider(BaseProvider):
             self.__pull_model(model["name"])
             self.__model_capabilies[model["name"]] = [LLMCapabilities(x) for x in model["capabilities"]]
 
-    def capabilities_of(self, model: str) -> list[LLMCapabilities] | None:
+    def get_capabilities_of(self, model: str) -> list[LLMCapabilities] | None:
         return self.__model_capabilies.get(model, None) 
 
     def list_models(self) -> str:

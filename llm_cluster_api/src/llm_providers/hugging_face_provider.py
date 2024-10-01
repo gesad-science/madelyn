@@ -24,7 +24,7 @@ class HuggingFaceProvider(BaseProvider):
                 "headers":{"Authorization": f"Bearer {self.token}"}
                }
 
-    def capabilities_of(self, model : str) -> list[LLMCapabilities] | None:
+    def get_capabilities_of(self, model : str) -> list[LLMCapabilities] | None:
         return self.__model_capabilies.get(model, None)
 
     def list_models(self) -> dict:
