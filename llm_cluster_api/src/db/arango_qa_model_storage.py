@@ -3,8 +3,10 @@ from src.exceptions.business_rule_exception import BusinessRuleException
 from src.llm.prompt_template import PromptTemplate
 from src.LLM_provider_storage import LLMProviderStorage
 # from src.utils.singleton import Singleton
+from src.llm.comprehension_services.comprehension_functions import ComprehensionFunctions
 from src.llm.LLModelQA import LLModelQA
 from uuid import UUID
+
 
 
 
@@ -106,6 +108,11 @@ class ArangoQAModelStorage():
             return False
 
     def add_model(self, model : LLModelQA):
+        cf = LLMProviderStorage.get_provider_with_model(model.name).get_comprehension_functions_of(model.name)
+        if  ComprehensionFunctions.QUESTION_AWNSER not in cf if cf else []:
+            raise BusinessRuleException(detail=f"Cant register models that are nota capable of QUESTION_AWNSER")
+
+
         try:
             self.collection.insert(self.__LLModelQA_to_arango_doc(model))
         except DocumentInsertError:
