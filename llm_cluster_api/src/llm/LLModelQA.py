@@ -1,11 +1,12 @@
 from src.llm.prompt_template import PromptTemplate
-from src.LLM_provider_storage import LLMProviderStorage
+# from src.llm.comprehension_services.question_awnser_service import QuestionAwnserService
 from src.exceptions.business_rule_exception import BusinessRuleException
+from src.LLM_provider_storage import LLMProviderStorage
 
 from uuid import UUID
 from src.llm.query_validator import QueryValidator
 
-class LLModel():
+class LLModelQA():
     def __init__(self,
                  name : str,
                  default_prompt : PromptTemplate, 
@@ -22,7 +23,8 @@ class LLModel():
             "name" : self.name,
             "main_prompt_uid": self.main_prompt.id,
             "prompt_alternatives_uid" : [ prompt.id for prompt in self.prompt_alternatives],
-            "validations" : self.validations
+            "validations" : self.validations,
+            "comprehension_functions": LLMProviderStorage.get_provider_with_model(self.name).get_comprehension_functions_of(self.name)
         }    
     
     def get_prompt(self, prompt_template_uid : UUID = None) -> PromptTemplate:
@@ -106,16 +108,15 @@ class LLModel():
             return True
         return False
 
-    def run_question_awnser_query(self, inputs : dict, prompt_template_uid : UUID = None):
-        prompt = self.get_prompt(prompt_template_uid)
+    # def make_call(self, inputs : dict, prompt_template_uid : UUID = None):
+    #     prompt = self.get_prompt(prompt_template_uid)
 
-        logs = QueryValidator.validate(prompt, inputs, self.validations)
+    #     logs = QueryValidator.validate(prompt, inputs, self.validations)
 
-        if len(logs) != 0:
-            return {'logs' : logs }
+    #     if len(logs) != 0:
+    #         return {'logs' : logs }
 
-        return {
-            "response" : LLMProviderStorage.get_provider_with_model(self.name).make_question_awnser_call(prompt= prompt.apply_input(inputs),
-                                                                             model=self.name)
-        }
+    #     return {
+    #         "response" : QuestionAwnserService.make_call(prompt= prompt.apply_input(inputs), model=self.name)
+    #     }
     

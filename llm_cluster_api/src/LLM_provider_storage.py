@@ -1,9 +1,8 @@
+from src.exceptions.business_rule_exception import BusinessRuleException
+from src.llm_providers.hugging_face_provider import HuggingFaceProvider
 from src.llm_providers.ollama_provider import OllamaProvider
 from src.llm_providers.base_provider import BaseProvider
-from src.exceptions.business_rule_exception import BusinessRuleException
 from abc import ABC
-import os
-from src.llm_providers.hugging_face_provider import HuggingFaceProvider
 
 
 from src.consts import OLLAMA_BASE_URL, OLLAMA_MODELS, HUGGING_FACE_MODELS, HUGGING_FACE_BASE_URL, HUGGING_FACE_TOKEN
@@ -39,10 +38,16 @@ class LLMProviderStorage(ABC):
     
     @classmethod
     def list_all_models(cls):
-        model_list = set()
+        model_names = set()
+        model_list = list()
 
         for provider in cls.__providers.values():
-            model_list =  model_list | set(provider.list_models())
+            print(provider)
+
+            for model in provider.list_models():
+                if model['name'] not in model_names:
+                    model_names.add(model['name'])
+                    model_list.append(model)
         return list(model_list)
 
     @classmethod

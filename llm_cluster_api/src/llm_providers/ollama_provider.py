@@ -1,5 +1,5 @@
 from src.exceptions.business_rule_exception import BusinessRuleException
-from src.llm.llm_capabilities import LLMCapabilities
+from src.llm.comprehension_services.comprehension_functions import ComprehensionFunctions
 from src.llm_providers.base_provider import BaseProvider
 import requests
 
@@ -26,9 +26,9 @@ class OllamaProvider(BaseProvider):
 
         for model in required_models:
             self.__pull_model(model["name"])
-            self.__model_capabilies[model["name"]] = [LLMCapabilities(x) for x in model["capabilities"]]
+            self.__model_capabilies[model["name"]] = [ComprehensionFunctions(x) for x in model["comprehension_functions"]]
 
-    def get_capabilities_of(self, model: str) -> list[LLMCapabilities] | None:
+    def get_comprehension_functions_of(self, model: str) -> list[ComprehensionFunctions] | None:
         return self.__model_capabilies.get(model, None) 
 
     def list_models(self) -> str:
@@ -42,18 +42,24 @@ class OllamaProvider(BaseProvider):
 
         json_res = response.json()
 
-        return [ {"name" : model['model'] , "capabilities" : self.__model_capabilies[model["model"]] } for model in json_res['models'] ]
+        return [ 
+                {
+                    "name" : model['model'], 
+                    "comprehension_functions" : self.__model_capabilies.get(model["model"], self.__model_capabilies.get(model["model"].split(':')[0]) )  
+                } 
+                  for model in json_res['models'] 
+                  ]
 
     def has_model(self, model) -> bool:
         models = self.list_models()
         for m in models:
-            if m == model or m.split(':')[0] == model:
+            if m == model or m["name"].split(':')[0] == model:
                 return True
 
         return False
 
     def make_question_awnser_call(self, prompt, model) -> str:
-        if LLMCapabilities.QUESTION_AWNSER not in self.__model_capabilies[model]:
+        if ComprehensionFunctions.QUESTION_AWNSER not in self.__model_capabilies[model]:
             raise BusinessRuleException(detail=f"Model {model} cant do question awnser")
 
         response = requests.post(self.base_url + '/api/generate',
@@ -75,8 +81,8 @@ class OllamaProvider(BaseProvider):
         return response.json()['response']
         
 
-    def make_text_similarity_call(self, text_1 : str, text_2 : str, model : str) -> bool:
-        if LLMCapabilities.TEXT_SIMILARITY not in self.__model_capabilies[model]:
+    def make_text_similarity_call(self, text_1 : str, text_2 : str, model : str) -> float:
+        if ComprehensionFunctions.TEXT_SIMILARITY not in self.__model_capabilies[model]:
             raise BusinessRuleException(detail=f"Model {model} cant do text similarity")
         response = requests.post(f"{self.base_url}/api/embed", json={"model": model,  "input": [text_1, text_2], "stream" : False})
 

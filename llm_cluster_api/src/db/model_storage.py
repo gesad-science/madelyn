@@ -1,14 +1,14 @@
-from src.llm.LLModel import LLModel
+from src.llm.LLModelQA import LLModelQA
 from abc import ABC
 from src.exceptions.business_rule_exception import BusinessRuleException
 
 
 class ModelStorage(ABC):
-    __models : list[LLModel] = []
+    __models : list[LLModelQA] = []
 
     # @staticmethod
     @classmethod
-    def get_model(cls, name : str ) -> LLModel:
+    def get_model(cls, name : str ) -> LLModelQA:
         for model in cls.__models:
             if model.name == name:
                 return model
@@ -25,7 +25,7 @@ class ModelStorage(ABC):
         return False
 
     @classmethod
-    def add_model(cls, model : LLModel):
+    def add_model(cls, model : LLModelQA):
         for m in cls.__models:
             if m.name == model.name:
                 raise BusinessRuleException(detail=f"{model.name} is already registered")

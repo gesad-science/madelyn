@@ -58,7 +58,7 @@ def _convert_to_batch_tensor(a: list | np.ndarray | Tensor) -> Tensor:
     return a
 
 
-def cos_sim(a: list | np.ndarray | Tensor, b: list | np.ndarray | Tensor) -> bool:
+def cos_sim(a: list | np.ndarray | Tensor, b: list | np.ndarray | Tensor) -> float:
     """
     Computes the cosine similarity between two tensors.
 
@@ -74,4 +74,5 @@ def cos_sim(a: list | np.ndarray | Tensor, b: list | np.ndarray | Tensor) -> boo
 
     a_norm = normalize_embeddings(a)
     b_norm = normalize_embeddings(b)
-    return torch.mm(a_norm, b_norm.transpose(0, 1)).item() > 0.75
+    # print(type(torch.mm(a_norm, b_norm.transpose(0, 1)).item()))
+    return torch.mm(a_norm, b_norm.transpose(0, 1)).item()
