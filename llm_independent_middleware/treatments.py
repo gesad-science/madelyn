@@ -1,7 +1,10 @@
 from entities import Treatmentinput
-from madelyn.llm_cluster_api.src.llm.LLModel import LLModel
+from ..llm_cluster_api.src.llm.LLModelQA import LLModelQA
+from ..llm_cluster_api.src.llm.comprehension_services.question_awnser_service import QuestionAwnserService
+import re
 
-def intent_filter(input : Treatmentinput, model : LLModel) -> Treatmentinput:
+'''
+def intent_filter(input : Treatmentinput, model : LLModelQA) -> Treatmentinput:
 
     value = input.value
 
@@ -16,3 +19,6 @@ def intent_filter(input : Treatmentinput, model : LLModel) -> Treatmentinput:
             if re.sub(r'^\s+|\s+$', '', option) in value:
                 return re.sub(r'^\s+|\s+$', '', option)
         return None
+'''
+
+
