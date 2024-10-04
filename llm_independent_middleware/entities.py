@@ -3,6 +3,7 @@ from typing import Callable, Optional
 from uuid import UUID
 
 from validations import * 
+from treatments import *
 
 from ..llm_cluster_api.src.db.model_storage import ModelStorage
 from ..llm_cluster_api.src.llm.LLModelQA import LLModelQA
@@ -79,7 +80,9 @@ class TreatmentCenter:
     treatments : list[Treatment]
 
     # List of treatments that are made every tive before the regular ones
-    mandatory_treatments : list[Treatment]
+    mandatory_treatments : list[Treatment] = [
+        Treatment(id=1, name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter)
+    ]
 
     """ 
         This is suposed to store the every pipeline of treatment
