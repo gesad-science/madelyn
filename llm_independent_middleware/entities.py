@@ -5,8 +5,10 @@ from uuid import UUID
 from validations import * 
 from treatments import *
 
-from ..llm_cluster_api.src.db.model_storage import ModelStorage
+from ..llm_cluster_api.src.db.arango_qa_model_storage import ArangoQAModelStorage
 from ..llm_cluster_api.src.llm.LLModelQA import LLModelQA
+from copy import deepcopy
+
 
 @dataclass
 class Treatmentinput:
@@ -14,6 +16,10 @@ class Treatmentinput:
     value : str
     processed_atts : dict[str, str]
     prompt_id_list : list[UUID]
+    
+
+    # Passing here the name of the desired model if it is needed
+    model_name : Optional[str]
 
     #not defined yet
 
@@ -72,7 +78,7 @@ class Treatment:
     # A description about the treatment
     description : Optional[str] = None
 
-    operation : Callable[[Treatmentinput, LLModelQA],Treatmentinput]
+    operation : Callable[[Treatmentinput],Treatmentinput]
 
 class TreatmentCenter:
 
@@ -115,21 +121,40 @@ class TreatmentCenter:
     @classmethod
     def run_line(cls, line_name : str, input : Treatmentinput):
 
-        pipeline = cls.treatment_lines[line_name]
+        treatments, validations = cls.treatment_lines[line_name]
         
         # executing mandatory treatments
         for treatment in cls.mandatory_treatments:
-            input = treatment(input, '') # passing empty as model, mandatory treatments should not request a model
+            # Changed from '' to None because it is expecting a 
+            input = treatment.operation(input, None) # passing empty as model, mandatory treatments should not request a model
+        
         
 
         # executing regular treatments and validations for each model
-        for model in ModelStorage.list_models():
-            for treatment in pipeline[0]:
-                for validation in pipeline[1]:
-                    if validation:
-                        return new_input
-                new_input = treatment(input, model)
+        for model in ArangoQAModelStorage.list_models():
 
-        # if not work return the input only with the mandatory treatments
+            # Making a deepcopy just to be sure that any treatment made with model A
+            # is passed to model B input 
+            input_ = deepcopy(input)
+            input_.model_name = model['name']
+
+            # Adding None at the end of the treatments so it repeat one more that
+            # to validate the last treatment changes
+            for treatment in treatments + [None]:
+                
+                ok = True # Flag to show if the input passed in all if its validations
+
+                for validation in validations:
+                    if not validation.operation(input):
+                        ok =False
+                        break
+                if ok:
+                    return input_
+                
+                if treatment is not None:
+                    input_ = treatment.operation(input)
+
+        
+
+        # Just returned it because dont really know what to do when nothing goes right 
         return input
-            
