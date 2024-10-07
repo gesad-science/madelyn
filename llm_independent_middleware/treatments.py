@@ -1,6 +1,7 @@
 from entities import Treatmentinput
 from ..llm_cluster_api.src.llm.LLModelQA import LLModelQA
 from ..llm_cluster_api.src.llm.comprehension_services.question_awnser_service import QuestionAwnserService
+from ..llm_cluster_api.src.db.arango_qa_model_storage import ArangoQAModelStorage
 import re
 
 '''
@@ -53,6 +54,14 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
     return input
 
+def request_new_answer(input : Treatmentinput) -> Treatmentinput:
 
-            
+    return QuestionAwnserService.make_call(prompt_uid=input.prompt_id, inputs={
+        'entity' : input.current_entity, 'user_msg' : input.user_input,
+        'attribute_key' : input.key,
+        'attribute_value' : input.value}, model_name=input.model_name)
+ 
+
+
+
 

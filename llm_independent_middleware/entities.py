@@ -15,7 +15,7 @@ class Treatmentinput:
     key : str
     value : str
     processed_atts : dict[str, str]
-    prompt_id_list : list[UUID]
+    prompt_id : UUID
     
 
     # Passing here the name of the desired model if it is needed
@@ -24,7 +24,7 @@ class Treatmentinput:
     #not defined yet
 
     user_input : str
-    current_entity : str = None
+    current_entity : Optional[str]
 
 #########################
 
@@ -83,11 +83,13 @@ class Treatment:
 class TreatmentCenter:
 
     # A list where all treatments are going to be registered
-    treatments : list[Treatment]
+    treatments : list[Treatment] = [
+        Treatment(treatment_id=2, name='new_request_treatment', description='A flag to indicate to the system to execute the treatments', operation=request_new_answer)
+    ]
 
     # List of treatments that are made every tive before the regular ones
     mandatory_treatments : list[Treatment] = [
-        Treatment(id=1, name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter)
+        Treatment(treatment_id=1, name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter)
     ]
 
     """ 
@@ -117,6 +119,36 @@ class TreatmentCenter:
             if tr.treatment_id == id:
                 return tr
         return None
+    
+    @classmethod
+    def run_validations(cls, input : Treatmentinput, validations : list):
+
+        ok = True # Flag to show if the input passed in all if its validations
+
+        for validation in validations:
+            if not validation.operation(input):
+                ok = False
+                break
+
+        return ok
+
+    @classmethod
+    def run_prompt_treatments(cls, input : Treatmentinput, model : LLModelQA):
+        for prompt in model.list_prompts()['prompt_alternatives_uid']:
+            input.prompt_id = prompt
+            answer = request_new_answer(input=input)
+            answer = cls.run_mandatory_treatments(answer)
+            if cls.run_validations(answer):
+                return answer
+        return None
+
+
+    @classmethod
+    def run_mandatory_treatments(cls, input : Treatmentinput):
+        for treatment in cls.mandatory_treatments:
+            input = treatment(input)
+        return input
+
 
     @classmethod
     def run_line(cls, line_name : str, input : Treatmentinput):
@@ -124,12 +156,8 @@ class TreatmentCenter:
         treatments, validations = cls.treatment_lines[line_name]
         
         # executing mandatory treatments
-        for treatment in cls.mandatory_treatments:
-            # Changed from '' to None because it is expecting a 
-            input = treatment.operation(input, None) # passing empty as model, mandatory treatments should not request a model
+        input = cls.run_mandatory_treatments(input)
         
-        
-
         # executing regular treatments and validations for each model
         for model in ArangoQAModelStorage.list_models():
 
@@ -141,18 +169,16 @@ class TreatmentCenter:
             # Adding None at the end of the treatments so it repeat one more that
             # to validate the last treatment changes
             for treatment in treatments + [None]:
-                
-                ok = True # Flag to show if the input passed in all if its validations
-
-                for validation in validations:
-                    if not validation.operation(input):
-                        ok =False
-                        break
-                if ok:
-                    return input_
-                
-                if treatment is not None:
-                    input_ = treatment.operation(input)
+                if input_:
+                    if cls.run_validations(input=input_, validations=validations):
+                        return input_
+                    if treatment.name== 'new_request_treatment':
+                        input_ = cls.run_prompt_treatments(input=input, model=model)
+                        if cls.run_prompt_treatments is not None:
+                            return input_
+                    elif treatment is not None:
+                        input_ = treatment.operation(input) 
+                        input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
 
         
 
