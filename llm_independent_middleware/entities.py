@@ -172,15 +172,17 @@ class TreatmentCenter:
                 if input_:
                     if cls.run_validations(input=input_, validations=validations):
                         return input_
+                    
+                    if treatment is None:
+                        break
+
                     if treatment.name== 'new_request_treatment':
                         input_ = cls.run_prompt_treatments(input=input, model=model)
-                        if cls.run_prompt_treatments is not None:
+                        if input_ is not None:
                             return input_
-                    elif treatment is not None:
+                    else:
                         input_ = treatment.operation(input) 
                         input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
-
-        
 
         # Just returned it because dont really know what to do when nothing goes right 
         return input

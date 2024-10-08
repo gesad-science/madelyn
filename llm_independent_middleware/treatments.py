@@ -56,10 +56,16 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
 def request_new_answer(input : Treatmentinput) -> Treatmentinput:
 
-    return QuestionAwnserService.make_call(prompt_uid=input.prompt_id, inputs={
-        'entity' : input.current_entity, 'user_msg' : input.user_input,
-        'attribute_key' : input.key,
-        'attribute_value' : input.value}, model_name=input.model_name)
+    return QuestionAwnserService.make_call(prompt_uid=input.prompt_id, 
+                                           inputs={
+                                               "variables":{
+                                                'entity' : input.current_entity, 
+                                                'user_msg' : input.user_input,
+                                                'attribute_key' : input.key,
+                                                'attribute_value' : input.value
+                                                }
+                                            }, 
+                                           model_name=input.model_name)
  
 
 
