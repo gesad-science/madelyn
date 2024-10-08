@@ -133,17 +133,6 @@ class TreatmentCenter:
         return ok
 
     @classmethod
-    def run_prompt_treatments(cls, input : Treatmentinput, model : LLModelQA):
-        for prompt in model.list_prompts()['prompt_alternatives_uid']:
-            input.prompt_id = prompt
-            answer = request_new_answer(input=input)
-            answer = cls.run_mandatory_treatments(answer)
-            if cls.run_validations(answer):
-                return answer
-        return None
-
-
-    @classmethod
     def run_mandatory_treatments(cls, input : Treatmentinput):
         for treatment in cls.mandatory_treatments:
             input = treatment(input)
@@ -169,20 +158,25 @@ class TreatmentCenter:
             # Adding None at the end of the treatments so it repeat one more that
             # to validate the last treatment changes
             for treatment in treatments + [None]:
-                if input_:
-                    if cls.run_validations(input=input_, validations=validations):
-                        return input_
-                    
-                    if treatment is None:
-                        break
 
-                    if treatment.name== 'new_request_treatment':
-                        input_ = cls.run_prompt_treatments(input=input, model=model)
-                        if input_ is not None:
+                for uid in model.list_prompts()['prompt_alternatives_uid']:
+
+                    if input_:
+
+                        if cls.run_validations(input=input_, validations=validations):
                             return input_
-                    else:
-                        input_ = treatment.operation(input) 
-                        input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+                        
+                        if treatment.name == 'new_request_treatment':
+                            input.prompt_id=uid
+                            input_ = treatment.operation(input) 
+                            input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+
+                        elif treatment is not None:
+                            input_ = treatment.operation(input) 
+                            input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+                            break
+
+        
 
         # Just returned it because dont really know what to do when nothing goes right 
         return input
