@@ -142,13 +142,17 @@ class TreatmentCenter:
     @classmethod
     def run_line(cls, line_name : str, input : Treatmentinput):
 
+        storage = ArangoQAModelStorage()
+
         treatments, validations = cls.treatment_lines[line_name]
         
         # executing mandatory treatments
         input = cls.run_mandatory_treatments(input)
+
+        model = storage.get_model(model['name'])
         
         # executing regular treatments and validations for each model
-        for model in ArangoQAModelStorage.list_models():
+        for model in storage.list_models():
 
             # Making a deepcopy just to be sure that any treatment made with model A
             # is passed to model B input 
@@ -159,19 +163,21 @@ class TreatmentCenter:
             # to validate the last treatment changes
             for treatment in treatments + [None]:
 
-                for uid in model.list_prompts()['prompt_alternatives_uid']:
+                model_class = storage.get_model(model['name'])
+
+                for uid in list(map(lambda x: x['prompt_alternatives_uid'], filter(lambda x: 'prompt_alternatives_uid' in x, model_class.list_prompts()))):
 
                     if input_:
 
                         if cls.run_validations(input=input_, validations=validations):
                             return input_
                         
-                        if treatment.name == 'new_request_treatment':
-                            input.prompt_id=uid
-                            input_ = treatment.operation(input) 
-                            input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
-
                         elif treatment is not None:
+                            if treatment.name == 'new_request_treatment':
+                                input.prompt_id = uid
+                                input_ = treatment.operation(input) 
+                                input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+                                break
                             input_ = treatment.operation(input) 
                             input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
                             break
