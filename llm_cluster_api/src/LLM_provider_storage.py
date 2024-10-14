@@ -1,13 +1,13 @@
 from src.llm_providers.base_provider import BaseProvider
 from src.llm_providers.ollama_provider import OllamaProvider
+from src.llm_providers.bedrock_provider import BedrockProvider
 from abc import ABC
 import os
-from src.consts import OLLAMA_BASE_URL
 
 class LLMProviderStorage(ABC):
     __providers : dict[str, BaseProvider] = {
         # 'bedrock' : BedrockProvider(),
-        'ollama' : OllamaProvider(OLLAMA_BASE_URL)
+        'ollama' : OllamaProvider(os.environ.get('OLLAMA_BASE_URL')),
     }
 
     __default = 'ollama'

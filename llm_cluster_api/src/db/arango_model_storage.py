@@ -1,12 +1,16 @@
 from src.exceptions.business_rule_exception import BusinessRuleException
 
+from src.utils.singleton import Singleton
 from src.llm.LLModel import LLModel
 from src.llm.prompt_template import PromptTemplate
 from arango import ArangoClient, DocumentDeleteError, DocumentUpdateError, DocumentInsertError
+import os
 from uuid import UUID
-from src.consts import ARANGODB_COLLECTION_NAME, ARANGODB_DATABASE_NAME, ARANGODB_PASSWORD, ARANGODB_URL, ARANGODB_USERNAME
 
-
+"""
+Acourding to a fast research pyarango is not thread safe by default, so
+initially im just going to init a new connection for each db interaction
+"""
 class ArangoModelStorage():
 
     def __init__(self, 
@@ -21,11 +25,11 @@ class ArangoModelStorage():
             # ARANGODB_PASSWORD = '123'
         # url = None
         if url is None:
-            url = ARANGODB_URL
+            url = os.environ.get('ARANGODB_URL')
         if username is None:
-            username = ARANGODB_USERNAME
+            username = os.environ.get('ARANGODB_USERNAME')
         if password is None:
-            password = ARANGODB_PASSWORD
+            password = os.environ.get('ARANGODB_PASSWORD')
 
         if url is None:
             raise Exception('Cant connect to arangodb since no url was provided nor ARANGODB_URL environment varible declared')
@@ -34,11 +38,11 @@ class ArangoModelStorage():
         if password is None:
             raise Exception('Cant connect to arangodb since no password was provided nor ARANGODB_PASSWORD environment varible declared')
 
-        if ARANGODB_COLLECTION_NAME is not None:
-            collection_name = ARANGODB_COLLECTION_NAME
+        if os.environ.get("ARANGODB_COLLECTION_NAME") is not None:
+            collection_name = os.environ.get("ARANGODB_COLLECTION_NAME")
 
-        if ARANGODB_DATABASE_NAME is not None:
-            db_name = ARANGODB_DATABASE_NAME
+        if os.environ.get("ARANGODB_DATABASE_NAME") is not None:
+            db_name = os.environ.get("ARANGODB_DATABASE_NAME")
 
         self.db = ArangoClient(hosts=url).db(db_name, password=password, username=username)
 

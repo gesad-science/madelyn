@@ -3,29 +3,22 @@ from src.exceptions.business_rule_exception import BusinessRuleException
 from src.llm_providers.base_provider import BaseProvider
 import requests
 
+from ollama import Client
+
 class OllamaProvider(BaseProvider):
-
-    __MASK_ERROR__ = "The server cant connect to the llm provider right now"
-
-    def __pull_model(self, model_name : str):
-        response = requests.post(f"{self.base_url}/api/pull", json={"name" : model_name, "stream": False})
-        if not response.ok:
-            raise BusinessRuleException(
-                                    detail= f'From Ollama: {response.json()["error"]}', 
-                                    private=True,
-                                    mask_detail= self.__MASK_ERROR__
-                                    )
 
     def __init__(self, base_url):
 
         self.base_url = base_url
 
+        c = Client(host=base_url)
+
         print("pulling")
 
-        for model in ['llama3', 'phi3']:
-            self.__pull_model(model)
+        c.pull("llama3")
+        c.pull("phi3")
 
-        print("concluded")
+        print("pulling ended")
 
 
 
@@ -36,7 +29,7 @@ class OllamaProvider(BaseProvider):
             raise BusinessRuleException(
                                     detail= f'From Ollama: + {response.json()["error"]}', 
                                     private=True,
-                                    mask_detail=self.__MASK_ERROR__
+                                    mask_detail="The server cant connect to the llm provider right now"
                                     )
 
         json_res = response.json()
@@ -66,7 +59,7 @@ class OllamaProvider(BaseProvider):
             raise BusinessRuleException(
                                     detail= f'From Ollama: + {response.json()["error"]}', 
                                     private=  True,
-                                    mask_detail=self.__MASK_ERROR__
+                                    mask_detail="The server cant connect to the llm provider right now"
                                    )
         
         return response.json()['response']
