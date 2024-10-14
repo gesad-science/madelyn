@@ -1,11 +1,9 @@
 from fastapi import FastAPI, status, Response, HTTPException
-from dotenv import load_dotenv
 
 from src.routers.prompts_router import prompts_router
 from src.routers.models_router import models_router
 from src.routers.validations_router import validations_router
 
-load_dotenv()
 
 tags_metadata = [
     {"name": "Model"},
