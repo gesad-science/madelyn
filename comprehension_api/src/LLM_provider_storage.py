@@ -4,7 +4,7 @@ from src.providers.base_provider import BaseProvider
 from abc import ABC
 
 
-from src.consts import HUGGING_FACE_MODELS, HUGGING_FACE_BASE_URL, HUGGING_FACE_TOKEN
+from src.consts import HUGGING_FACE_MODELS, HUGGING_FACE_BASE_URL
 
 class LLMProviderStorage(ABC):
     __providers : dict[str, BaseProvider] = {
