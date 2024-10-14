@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HUGGING_FACE_TOKEN = os.environ.get("HUGGING_FACE_TOKEN")
 HUGGING_FACE_BASE_URL = os.environ.get("HUGGING_FACE_BASE_URL")
 HUGGING_FACE_MODELS = [
     {

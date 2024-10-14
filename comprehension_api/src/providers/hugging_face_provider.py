@@ -2,8 +2,6 @@
 from src.comprehension_services.comprehension_functions import ComprehensionFunctions
 import requests
 from src.utils.similarity import cos_sim
-from src.consts import HUGGING_FACE_MODELS, HUGGING_FACE_BASE_URL, HUGGING_FACE_TOKEN
-
 
 from transformers import pipeline
 from sentence_transformers import SentenceTransformer
@@ -34,8 +32,7 @@ class HuggingFaceProvider(BaseProvider):
     # }
 
 
-    def __init__(self, base_url, token, required_models : list[dict[str, list[str] | str]]) -> None:
-        self.token = token
+    def __init__(self, base_url, required_models : list[dict[str, list[str] | str]]) -> None:
         self.base_url = base_url
         self.__model_capabilies = dict()
         for model in required_models:

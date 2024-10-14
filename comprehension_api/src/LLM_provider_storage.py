@@ -8,7 +8,7 @@ from src.consts import HUGGING_FACE_MODELS, HUGGING_FACE_BASE_URL, HUGGING_FACE_
 
 class LLMProviderStorage(ABC):
     __providers : dict[str, BaseProvider] = {
-        'hugging_face' : HuggingFaceProvider(base_url= HUGGING_FACE_BASE_URL, token=HUGGING_FACE_TOKEN, required_models=HUGGING_FACE_MODELS),
+        'hugging_face' : HuggingFaceProvider(base_url= HUGGING_FACE_BASE_URL, required_models=HUGGING_FACE_MODELS),
     }
 
     __default = 'hugging_face'
