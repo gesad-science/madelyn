@@ -2,14 +2,16 @@ from src.llm.query_validator import QueryValidator
 from src.models.prompt import Prompt
 from src.llm.LLModel import LLModel
 from src.exceptions.business_rule_exception import BusinessRuleException
-
+from src.models.prompt_list import PromptList
 from pydantic import BaseModel
 from uuid import uuid4
 
 class Model(BaseModel):
     name : str
-    default_prompt : Prompt
-    prompt_alternatives : list[Prompt] = []
+    intent : PromptList
+    entity : PromptList
+    attribute : PromptList
+    filter : PromptList
     validations : list[int] = []
 
     def to_LLModel(self) -> LLModel:
@@ -22,7 +24,9 @@ class Model(BaseModel):
 
         return LLModel(
             name= self.name,
-            default_prompt= self.default_prompt.to_PromptTemplate(uuid4()),
+            attribute=self.attribute.to_PromptLine(),
+            intent=self.intent.to_PromptLine(),
+            entity=self.entity.to_PromptLine(),
+            filter=self.filter.to_PromptLine(),
             validations= self.validations,
-            prompt_alternatives= [ prompt.to_PromptTemplate(uuid4()) for prompt in self.prompt_alternatives]
         )
