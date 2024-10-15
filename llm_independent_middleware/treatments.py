@@ -22,6 +22,10 @@ def intent_filter(input : Treatmentinput, model : LLModelQA) -> Treatmentinput:
         return None
 '''
 
+def cleaning_treatment(input : Treatmentinput) -> Treatmentinput:
+    input.value = re.sub(r'^\s+|\s+$', '', input.value)
+    return input
+
 def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
     words = input.value.split(' ')
@@ -66,8 +70,38 @@ def request_new_answer(input : Treatmentinput) -> Treatmentinput:
                                                 }
                                             }, 
                                            model_name=input.model_name)
+
+def string_and_treatment(input : Treatmentinput) -> Treatmentinput:
+
+    if input.prompt_id:
+        return input
+
+    user_msg = input.user_input
+    key = input.key
+
+    # getting everything after the attribute key and before an addition marker
+    fragment_short = user_msg[user_msg.find(key) + len(key):]
+    fragment_short = user_msg.split(',')[0]
+    fragment_short = fragment_short.split(' and ')[0]
+
+    input.value = fragment_short
+
+    return input
+
+def string_noise_treatment(input : Treatmentinput) -> Treatmentinput:
+
+    if input.prompt_id:
+        return input
+
+    user_msg = input.user_input
+    key = input.key
+
+    fragment_short = user_msg[user_msg.find(key) + len(key):]
+    fragment_short = fragment_short.replace('=', '').replace("'", '').replace('"', '').replace('\n', '')
+
+    input.value = fragment_short
+
+    return input
+
  
-
-
-
 
