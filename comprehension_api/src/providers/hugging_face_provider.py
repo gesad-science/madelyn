@@ -38,7 +38,6 @@ class HuggingFaceProvider(BaseProvider):
         for model in required_models:
             self.__model_capabilies[model["name"]] = [ComprehensionFunctions(x) for x in model["comprehension_functions"]]
 
-
     def get_comprehension_functions_of(self, model : str) -> list[ComprehensionFunctions] | None:
         return self.__model_capabilies.get(model, None)
 
@@ -48,7 +47,17 @@ class HuggingFaceProvider(BaseProvider):
     def has_model(self, model : str) -> bool:
         return model in self.__model_capabilies
 
-    def make_token_classification_call(self, prompt : str, model : str) -> list[dict]:
+    def make_token_classification_call(self, prompt : str, model : str = None) -> list[dict]:
+
+        if model is None:
+            for name, functions in self.__model_capabilies.items():
+                if ComprehensionFunctions.TOKEN_CLASSIFICATION in functions:
+                    model = name 
+                    break
+
+        if model not in self.__model_capabilies:
+            raise BusinessRuleException(detail=f"{model} is not one of the available models")
+
         if ComprehensionFunctions.TOKEN_CLASSIFICATION not in self.__model_capabilies[model]:
             raise BusinessRuleException(detail=f"Model {model} cant do token classification")
         
@@ -60,13 +69,33 @@ class HuggingFaceProvider(BaseProvider):
 
         return ans
     
-    def make_sentiment_analysis_call(self, prompt : str, model : str) -> list[dict]:
+    def make_sentiment_analysis_call(self, prompt : str, model : str = None) -> list[dict]:
+
+        if model is None:
+            for name, functions in self.__model_capabilies.items():
+                if ComprehensionFunctions.SENTIMENT_ANALYSIS in functions:
+                    model = name 
+                    break
+
+        if model not in self.__model_capabilies:
+            raise BusinessRuleException(detail=f"{model} is not one of the available models")
+
         if ComprehensionFunctions.SENTIMENT_ANALYSIS not in self.__model_capabilies[model]:
             raise BusinessRuleException(detail=f"Model {model} cant do token sentiment analysis")
         
         return pipeline("sentiment-analysis", model=model)(prompt)
 
-    def make_text_similarity_call(self, text_1 : str, text_2 : str, model : str) -> float:
+    def make_text_similarity_call(self, text_1 : str, text_2 : str, model : str  = None) -> float:
+
+        if model is None:
+            for name, functions in self.__model_capabilies.items():
+                if ComprehensionFunctions.TEXT_SIMILARITY in functions:
+                    model = name 
+                    break
+
+        if model not in self.__model_capabilies:
+            raise BusinessRuleException(detail=f"{model} is not one of the available models")
+
         if ComprehensionFunctions.TEXT_SIMILARITY not in self.__model_capabilies[model]:
             raise BusinessRuleException(detail=f"Model {model} cant do text similarity")
         
