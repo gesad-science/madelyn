@@ -77,19 +77,6 @@ class LLModel():
         for prompt_template_uid in prompt_template_uids:        
             self.remove_prompt_alternative(prompt_template_uid)
 
-    def run_query(self, inputs : dict, prompt_template_uid : UUID = None):
-        prompt = self.get_prompt(prompt_template_uid)
-
-        logs = QueryValidator.validate(prompt, inputs, self.validations)
-
-        if len(logs) != 0:
-            return {'logs' : logs }
-
-        return {
-            "response" : LLMProviderStorage.get_default_provider().make_call(prompt= prompt.apply_input(inputs),
-                                                                             model=self.name)
-        }
-
     def add_validations(self, validations : list[int]) -> tuple[bool, list[int]]:
         invalid_ones = QueryValidator.invalid_validations_from(validations)
         if len(invalid_ones) > 0:
@@ -148,3 +135,5 @@ class LLModel():
         self.main_prompt = prompt
         self.add_prompt_alternative(main_prompt)
         
+    def get_prompts_of_type(self, prompt_type : PromptType) -> PromptLine:
+        return self.__prompt_types[prompt_type]

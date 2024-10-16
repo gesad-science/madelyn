@@ -70,7 +70,7 @@ class ArangoModelStorage():
         return PromptLine(
             main_prompt=ArangoModelStorage.__arango_doc_to_PromptTemplate(arango_doc["main_prompt"]),
             prompt_alternatives=[
-                ArangoModelStorage.__arango_doc_to_PromptTemplate() for x in arango_doc["prompt_alternatives"]
+                ArangoModelStorage.__arango_doc_to_PromptTemplate(x) for x in arango_doc["prompt_alternatives"]
             ]
         )
 
