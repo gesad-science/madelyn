@@ -1,13 +1,5 @@
 typeguard==4.3.0
 pydantic==2.8.2
-# urllib3==1.26.0
 requests==2.32.3
 python-arango==8.1.0
 fastapi[standard]==0.112.1
-transformers==4.44.2
-# tensorflow==2.17.0
-# tf_keras==2.17.0
-torch==2.4.1
-
-sentence_transformers==3.1.0
-# numpy==1.17.0
