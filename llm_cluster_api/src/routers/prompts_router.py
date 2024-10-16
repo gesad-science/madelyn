@@ -4,6 +4,7 @@ from src.db.arango_model_storage import ArangoModelStorage
 from src.models.prompt import Prompt
 from uuid import UUID
 import uuid
+from src.llm.LLModel import PromptType
 
 prompts_router = APIRouter()
 
@@ -19,7 +20,7 @@ def get_single_prompt(name : str, prompt_uid : UUID):
 
 @prompts_router.post('/models/{name}/prompts', tags=["Prompt"])
 @business_rule_exception_check
-def post_prompts(name:str, prompts : list[Prompt]):
+def post_prompts(name:str, prompts : list[Prompt], prompt_type : PromptType):
     model_storage = ArangoModelStorage()
     model = model_storage.get_model(name)
 
@@ -27,7 +28,8 @@ def post_prompts(name:str, prompts : list[Prompt]):
     for prompt in prompts:
         new_uids.append(uuid.uuid4())
         model.add_prompt_alternative(
-            prompt.to_PromptTemplate(new_uids[-1])
+                prompt.to_PromptTemplate(new_uids[-1]),
+                prompt_type
             )
         
     model_storage.update_model(model)
@@ -50,7 +52,6 @@ def swap_main_prompt(name : str, prompt_uid : UUID):
     model.swap_prompt_for_alternative(prompt_uid)
     model_storage.update_model(model)
     return "Ok"
-
 
 @prompts_router.put('/models/{name}/prompts/main', tags=["Prompt"])
 @business_rule_exception_check

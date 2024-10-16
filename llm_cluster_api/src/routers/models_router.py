@@ -8,6 +8,7 @@ from src.models.model import Model
 from src.models.query import Query
 
 from src.decorators.business_rule_exception_check import business_rule_exception_check
+from src.llm.qa_service import QAService
 
 models_router = APIRouter()
 
@@ -57,8 +58,18 @@ def put_model(model : Model):
 @models_router.post('/models/{name}/query', tags=["Query"])
 @business_rule_exception_check
 def query(name : str, prompt_input : Query):
-        return ArangoModelStorage().get_model(name).run_query(
-            inputs={
-                "variables": prompt_input.variables or []
-            }
-        )
+        
+    ans = QAService().make_call(
+        model= ArangoModelStorage().get_model(name),
+        inputs={
+            "variables": prompt_input.variables or []
+        },
+        prompt_type= prompt_input.prompt_type
+    )
+
+    if 'error' in ans:
+            raise HTTPException(status_code=400, detail=ans['error'])
+    return {
+         'data' : ans
+    }
+        
