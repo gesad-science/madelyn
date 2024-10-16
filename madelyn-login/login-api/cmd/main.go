@@ -29,5 +29,5 @@ func initStorage(db *sql.DB) {
 		log.Fatal(err)
 	}
 
-  log.Println("[ POSTGRES ] - users table: Successfully connected")
+  log.Println("[ POSTGRES ] - users batabase: Successfully connected")
 }
