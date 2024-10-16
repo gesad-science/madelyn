@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException
-from src.query_router import query_router
 from fastapi import HTTPException
 from src.comprehension_services.sentiment_analysis_service import SentimentAnalysisService
 from src.comprehension_services.token_classification_service import TokenClassificationService
@@ -10,7 +9,6 @@ from src.LLM_provider_storage import LLMProviderStorage
 from pydantic import BaseModel
 
 app = FastAPI()
-app.include_router(query_router)
 
 class QueryComprehension(BaseModel):
     func : ComprehensionFunctions
