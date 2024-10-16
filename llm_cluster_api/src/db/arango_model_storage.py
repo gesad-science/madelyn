@@ -6,6 +6,7 @@ from src.llm.prompt_template import PromptTemplate
 from arango import ArangoClient, DocumentDeleteError, DocumentUpdateError, DocumentInsertError
 import os
 from uuid import UUID
+from src.llm.prompt_line import PromptLine
 
 from src.consts import ARANGODB_COLLECTION_NAME, ARANGODB_DATABASE_NAME, ARANGODB_PASSWORD, ARANGODB_URL, ARANGODB_USERNAME
 
@@ -65,12 +66,22 @@ class ArangoModelStorage():
         )
 
     @staticmethod
+    def __arango_doc_to_PromptLine(arango_doc : dict) -> PromptLine:
+        return PromptLine(
+            main_prompt=ArangoModelStorage.__arango_doc_to_PromptTemplate(arango_doc["main_prompt"]),
+            prompt_alternatives=[
+                ArangoModelStorage.__arango_doc_to_PromptTemplate(x) for x in arango_doc["prompt_alternatives"]
+            ]
+        )
+
+    @staticmethod
     def __arango_doc_to_LLModel(arango_doc : dict) -> LLModel:
         return LLModel(
             name = arango_doc["_key"],
-            default_prompt=  ArangoModelStorage.__arango_doc_to_PromptTemplate(arango_doc["main_prompt"]),
-            prompt_alternatives=[ ArangoModelStorage.__arango_doc_to_PromptTemplate(p) 
-                                  for p in arango_doc["prompt_alternatives"]],
+            intent= ArangoModelStorage.__arango_doc_to_PromptLine(arango_doc["intent"]),
+            entity= ArangoModelStorage.__arango_doc_to_PromptLine(arango_doc["entity"]),
+            filter= ArangoModelStorage.__arango_doc_to_PromptLine(arango_doc["filter"]),
+            attribute= ArangoModelStorage.__arango_doc_to_PromptLine(arango_doc["attribute"]),
             validations = arango_doc["validations"]
         )
 
@@ -83,12 +94,22 @@ class ArangoModelStorage():
         }
 
     @staticmethod
+    def __PromptLine_to_arango_doc(prompt_line : PromptLine) -> dict: 
+        return {
+            "main_prompt": ArangoModelStorage.__PromptTemplate_to_arango_doc(prompt_line.main_prompt),
+            "prompt_alternatives": [
+                ArangoModelStorage.__PromptTemplate_to_arango_doc(x) for x in prompt_line.prompt_alternatives
+            ]
+        }
+
+    @staticmethod
     def __LLModel_to_arango_doc(model : LLModel) -> dict:
         return {
             "_key": model.name,
-            "main_prompt": ArangoModelStorage.__PromptTemplate_to_arango_doc(model.main_prompt),
-            "prompt_alternatives": [ ArangoModelStorage.__PromptTemplate_to_arango_doc(p) 
-                                     for p in model.prompt_alternatives],
+            "filter":  ArangoModelStorage.__PromptLine_to_arango_doc(model.filter),
+            "entity":  ArangoModelStorage.__PromptLine_to_arango_doc(model.entity),
+            "intent":  ArangoModelStorage.__PromptLine_to_arango_doc(model.intent),
+            "attribute":  ArangoModelStorage.__PromptLine_to_arango_doc(model.attribute),
             "validations": model.validations
         }
 
