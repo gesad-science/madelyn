@@ -12,9 +12,14 @@ class PromptTemplate:
     def __apply_variables(text : str, inputs) -> str:
         variables = []
         for variable in inputs["variables"] or []:
-            variables.append([text.find('{'+ variable +'}'), variable])
+            pos = -1
+            while True:
+                pos = text.find('{'+ variable +'}', pos + 1)
+                if pos == -1:
+                    break
+                variables.append([pos, variable])
 
-        variables = sorted(variables)[::-1]
+        variables = sorted(variables, reverse=True)
 
 
         for _, variable in variables:
