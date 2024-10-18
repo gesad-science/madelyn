@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from uuid import UUID
+from uuid import UUID, uuid4
 import copy
 
 @dataclass
@@ -10,20 +10,15 @@ class PromptTemplate:
 
     @staticmethod
     def __apply_variables(text : str, inputs) -> str:
-        variables = []
-        for variable in inputs["variables"] or []:
-            pos = -1
-            while True:
-                pos = text.find('{'+ variable +'}', pos + 1)
-                if pos == -1:
-                    break
-                variables.append([pos, variable])
+        variables = inputs['variables'] if 'variables' in inputs else {}
+    
+        var_and_uuid= [(variable, uuid4().__str__()) for variable in variables]
 
-        variables = sorted(variables, reverse=True)
+        for variable, uid in var_and_uuid:
+            text = text.replace('{'+variable+'}', '{'+uid+'}')
 
-
-        for _, variable in variables:
-            text = text.replace('{'+ variable+ '}', inputs["variables"][variable], 1)
+        for variable, uid in var_and_uuid:
+            text = text.replace('{'+uid+'}', variables[variable])
 
         print(text)
         return text
