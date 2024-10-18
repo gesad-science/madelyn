@@ -117,7 +117,17 @@ class Interpretation_module:
                         fragment_short_idx = self.user_msg.find(attribute_key)
                         fragment_short = self.user_msg[fragment_short_idx + len(attribute_key)]
 
-                        find_attribute = QAService().make_call(inputs={"variables" : {"attribute_key" : attribute_key, "entity" : self.entity, "user_msg" : self.user_msg, "fragment_short" : fragment_short}}, prompt_type=PromptType.ENTITY, model=self.model)
+                        find_attribute = QAService().make_call(inputs={
+                                                                            "variables" : {
+                                                                                      "attribute_key" : attribute_key, 
+                                                                                      "entity" : self.entity, 
+                                                                                      "user_msg" : self.user_msg, 
+                                                                                      "fragment_short" : fragment_short,
+                                                                                      "user_intent" : self.intent
+                                                                                      }
+                                                                       }, 
+                                                                       prompt_type=PromptType.ENTITY, model=self.model
+                                                                )
                         find_attribute = find_attribute['response']
 
                         self.attributes[attribute_key] = find_attribute

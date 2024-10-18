@@ -54,9 +54,9 @@ models = [
     },
     "attribute": {
         "default_prompt": {
-        "template": "QUESTION: What is the {attribute_key} in the sentence fragment?\nAnswer me with the exact substring of the sentence fragment.\nAnswer me with only the value of the attribute.\nThe answer must be different from {attribute_key}.\n-CONTEXT: This is the user command: {user_msg}.\nThe intent of the user command is #user_intent.\nThe entity class is {entity}. \nThe answer is a substring of {fragment_short}.\n{attribute_key} is the name of a field in the database.\nI'm trying discover the value of the {attribute_key} in the sentence fragment.\nIn another words, complete to me {attribute_key} + ' = ' ?\nAnswer me with only the value of the attribute.",
+        "template": "QUESTION: What is the {attribute_key} in the sentence fragment?\nAnswer me with the exact substring of the sentence fragment.\nAnswer me with only the value of the attribute.\nThe answer must be different from {attribute_key}.\n-CONTEXT: This is the user command: {user_msg}.\nThe intent of the user command is {user_intent}.\nThe entity class is {entity}. \nThe answer is a substring of {fragment_short}.\n{attribute_key} is the name of a field in the database.\nI'm trying discover the value of the {attribute_key} in the sentence fragment.\nIn another words, complete to me {attribute_key} + ' = ' ?\nAnswer me with only the value of the attribute.",
         "args": {
-            "variables" : ["attribute_key", "entity", "user_msg", "fragment_short"]
+            "variables" : ["attribute_key", "entity", "user_msg", "fragment_short", "user_intent"]
         }
         },
         "prompt_alternatives": []
