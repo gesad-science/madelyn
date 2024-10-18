@@ -1,7 +1,7 @@
 import requests
-from config import COMPREHENSION_API_URL
-from ..llm.LLModel import LLModel, PromptType
-from ..llm.qa_service import QAService
+from src.interpretation_functions.config import COMPREHENSION_API_URL
+from src.llm.LLModel import LLModel, PromptType
+from src.llm.qa_service import QAService
 from enum import Enum
 
 class Intent(Enum):
@@ -20,7 +20,8 @@ class Interpretation_module:
         self.tokens = self.generate_tokens_classification()
         self.intent = self.get_intent()
         self.entity = self.get_entity()
-        self.attributes = self.get_attributes()
+        self.attributes = {}
+        self.get_attributes()
 
     def generate_tokens_classification(self):
         data = {
@@ -35,25 +36,26 @@ class Interpretation_module:
 
     def get_intent(self) -> Intent:
         if self.tokens:
-
+            '''
             candidate = None
             
             for token in self.tokens:
                 if token['entity'] == 'VERB':
                     candidate = token['word']
                     break
-
-            # send the first verb as a hint to the model
-            response = QAService.make_call(inputs={'user_msg' : self.user_msg, 'first_verb' : candidate}, prompt_type=PromptType.INTENT, model=self.model)
             
+            # send the first verb as a hint to the model
+            '''
+            response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.INTENT, model=self.model)
+            response = response['response']
             match(response):
-                case 'create':
+                case 'CREATE':
                     return Intent.CREATE
-                case 'read':
+                case 'READ':
                     return Intent.READ
-                case 'update':
+                case 'UPDATE':
                     return Intent.UPDATE
-                case 'delete':
+                case 'DELETE':
                     return Intent.DELETE
         else:
             return None
@@ -62,7 +64,7 @@ class Interpretation_module:
 
     def get_entity(self):
         if self.tokens:
-
+            '''
             candidate = None
 
             for token in self.tokens:
@@ -70,7 +72,7 @@ class Interpretation_module:
                     candidate = token['word']
                     break
             
-            '''
+            
             # we will need some function to get the existing tables/entities, for that instance, as a list
 
             entities = database.get_entities()
@@ -89,7 +91,9 @@ class Interpretation_module:
             '''
 
             # by now, passing the first noun as an input for prompt
-            response = QAService.make_call(inputs={'user_msg' : self.user_msg, 'first_noun' : candidate}, prompt_type=PromptType.ENTITY, model=self.model)
+            response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.ENTITY, model=self.model)
+
+            response = response['response']
 
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
@@ -108,8 +112,14 @@ class Interpretation_module:
             for token in self.tokens:
                 if find_attribute is None:
                     if token['entity'] == 'NOUN' and token['word'] != self.entity: # or if the word is a known attribute key --but not implemented yet--
+
                         attribute_key = token['word']
-                        find_attribute = QAService.make_call(inputs={'user_msg' : self.user_msg, 'attribute_key' : attribute_key}, prompt_type=PromptType.ENTITY, model=self.model)
+                        fragment_short_idx = self.user_msg.find(attribute_key)
+                        fragment_short = self.user_msg[fragment_short_idx + len(attribute_key)]
+
+                        find_attribute = QAService().make_call(inputs={"variables" : {"attribute_key" : attribute_key, "entity" : self.entity, "user_msg" : self.user_msg, "fragment_short" : fragment_short}}, prompt_type=PromptType.ENTITY, model=self.model)
+                        find_attribute = find_attribute['response']
+
                         self.attributes[attribute_key] = find_attribute
                 else:
                     if token['word'] == find_attribute:
@@ -120,4 +130,3 @@ class Interpretation_module:
         
     def extract_data(self):
         return {'user_msg' : self.user_msg, 'intent' : self.intent, 'entity' : self.entity, 'attributes' : self.attributes}
-
