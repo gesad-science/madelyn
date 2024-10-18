@@ -4,6 +4,8 @@ from src.llm.LLModel import LLModel, PromptType
 from src.llm.qa_service import QAService
 from enum import Enum
 
+import re
+
 class Intent(Enum):
     CREATE = 'create',
     READ = 'read',
@@ -34,7 +36,7 @@ class Interpretation_module:
         return response.json()['data']
 
 
-    def get_intent(self) -> Intent:
+    def get_intent(self):
         if self.tokens:
             '''
             candidate = None
@@ -48,17 +50,24 @@ class Interpretation_module:
             '''
             response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.INTENT, model=self.model)
             response = response['response']
+
+            # while lim is not ready, make some treatments here
+            response = re.sub(r'^\s+|\s+$', '', response)
+            response = response.lower()
+
             match(response):
-                case 'CREATE':
-                    return Intent.CREATE
-                case 'READ':
-                    return Intent.READ
-                case 'UPDATE':
-                    return Intent.UPDATE
-                case 'DELETE':
-                    return Intent.DELETE
+                case 'create':
+                    return Intent.CREATE.__str__()
+                case 'read':
+                    return Intent.READ.__str__()
+                case 'update':
+                    return Intent.UPDATE.__str__()
+                case 'delete':
+                    return Intent.DELETE.__str__()
+                case _:
+                    return Intent.CREATE.__str__()
         else:
-            return None
+            return Intent.CREATE.__str__()
 
 
 
@@ -95,6 +104,10 @@ class Interpretation_module:
 
             response = response['response']
 
+            # while lim is not ready, make some treatments here
+            response = re.sub(r'^\s+|\s+$', '', response)
+            response = response.lower()
+
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
 
@@ -126,9 +139,13 @@ class Interpretation_module:
                                                                                       "user_intent" : self.intent
                                                                                       }
                                                                        }, 
-                                                                       prompt_type=PromptType.ENTITY, model=self.model
+                                                                       prompt_type=PromptType.ATTRIBUTE, model=self.model
                                                                 )
                         find_attribute = find_attribute['response']
+
+                        # while lim is not ready, make some treatments here
+                        find_attribute = re.sub(r'^\s+|\s+$', '', find_attribute)
+                        find_attribute = find_attribute.lower()
 
                         self.attributes[attribute_key] = find_attribute
                 else:
