@@ -23,7 +23,7 @@ services:
       - arangodb-data:/var/lib/arangodb3
     restart: always
 
-  api:
+  llm_cluster:
     build: 
       context: ./llm_cluster_api
       dockerfile: Dockerfile-API
@@ -38,6 +38,18 @@ services:
     depends_on:
       - arangodb
       - ollama  
+    restart: always
+
+
+
+  comprehension_api:
+    build:
+      context: ./comprehension_api
+      dockerfile: Dockerfile
+    environment:
+      - HUGGING_FACE_BASE_URL=https://api-inference.huggingface.co/
+    ports:
+      - "7000:7000"
     restart: always
 volumes: 
   arangodb-data:
