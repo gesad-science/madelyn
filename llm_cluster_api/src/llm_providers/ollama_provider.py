@@ -24,7 +24,7 @@ class OllamaProvider(BaseProvider):
 
         print("pulling")
 
-        for model in ['llama3', 'phi3']:
+        for model in [ 'mistral', 'llama3', 'phi3']:
             self.__pull_model(model)
 
         print("ended")
