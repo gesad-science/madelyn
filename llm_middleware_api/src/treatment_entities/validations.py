@@ -1,5 +1,6 @@
-from entities import Treatmentinput
-from ..llm_cluster_api.src.llm.comprehension_services.token_classification_service import TokenClassificationService
+from .entities import Treatmentinput
+import requests
+from src.config import COMPREHENSION_SERVICE_URL
 
 # from entities import Promptvalidation, Treatmentinput
 
@@ -18,11 +19,23 @@ from ..llm_cluster_api.src.llm.comprehension_services.token_classification_servi
 
 ##############
 
+def token_classification_service(text : str):
+    data = {
+        "func": "TOKEN_CLASSIFICATION",
+        "inputs": [
+            text
+        ]
+    }
+    response = requests.post(COMPREHENSION_SERVICE_URL, json=data)
+    return response.json()['data']
+
 def len_test(input : Treatmentinput) -> bool:
     value = input.value
-    if len(value) <= 0:
-        return False
-    return True
+    if value:
+        if len(value) <= 0:
+            return False
+        return True
+    return False
 
 def key_test(input : Treatmentinput) -> bool:
     value = input.value
@@ -48,7 +61,7 @@ def att_test(input : Treatmentinput) -> bool:
 
 def pronoun_test(input : Treatmentinput) -> bool: # should be increased in the future
 
-    tokens = TokenClassificationService.make_call(model='vblagoje/bert-english-uncased-finetuned-pos', text=input.value)
+    tokens = token_classification_service(input.value)
 
     propn = False
     for token in tokens:  # if there is a pronoun followed by a comma
@@ -68,7 +81,7 @@ def entity_test(input : Treatmentinput) -> bool: # should be increased in the fu
     
 def ignoring_test(input : Treatmentinput) -> bool:
 
-    tokens = TokenClassificationService.make_call(model='vblagoje/bert-english-uncased-finetuned-pos', text=input.user_input)
+    tokens = token_classification_service(input.value)
 
     key_find = False
     tokens_entity = []
@@ -88,7 +101,7 @@ def ignoring_test(input : Treatmentinput) -> bool:
 
 def float_test(input : Treatmentinput) -> bool:
 
-    tokens = TokenClassificationService.make_call(model='vblagoje/bert-english-uncased-finetuned-pos', text=input.user_input)
+    tokens = token_classification_service(input.value)
 
     integer_part = None
     j = 0
@@ -124,7 +137,7 @@ def float_test(input : Treatmentinput) -> bool:
     return True
 
 def char_test(input : Treatmentinput) -> bool: # should be increased in the future
-    tokens = TokenClassificationService.make_call(model='vblagoje/bert-english-uncased-finetuned-pos', text=input.value)
+    tokens = token_classification_service(input.value)
     potential_value = False
     for token in tokens:  # if there is some "noise character" on the final answer
         if potential_value == True and token['entity'] == 'SYM':

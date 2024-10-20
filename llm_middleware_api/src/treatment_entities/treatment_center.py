@@ -1,47 +1,8 @@
-from dataclasses import dataclass
-from typing import Callable, Optional
-from uuid import UUID
-
-from validations import * 
-from treatments import *
-
-from ..llm_cluster_api.src.db.arango_qa_model_storage import ArangoQAModelStorage
-from ..llm_cluster_api.src.llm.LLModelQA import LLModelQA
 from copy import deepcopy
+from .entities import Treatment, PromptValidation
 
-
-@dataclass
-class Treatmentinput:
-    key : str
-    value : str
-    processed_atts : dict[str, str]
-    prompt_id : UUID
-    
-
-    # Passing here the name of the desired model if it is needed
-    #model_name : Optional[str]
-
-    #not defined yet
-
-    user_input : str
-    current_entity : Optional[str]
-
-#########################
-
-
-@dataclass
-class PromptValidation:
-
-    # A exclusive identifier to the PromptValidation
-    #prompt_validation_id : int
-
-    # The name of the PromptValidation
-    name : str
-
-    # A description about the PromptValidation
-    description : Optional[str] = None
-
-    operation : Callable[[Treatmentinput],bool]
+from .validations import * 
+from .treatments import *
 
 class PromptValidationCenter:
 
@@ -57,28 +18,6 @@ class PromptValidationCenter:
             PromptValidation(name='float_validation', description='checks if the wanted value is a float value, and then discover if the model correctly find the value or only the integer part', operation=float_test),
             PromptValidation(name='char_validation', description='checks if the answer has some noise characters', operation=char_test)
     ]
-
-
-    @classmethod
-    def get_validation_by_id(cls, id : int) :
-        for pv in cls.PromptValidations:
-            if pv.prompt_validation_id == id:
-                return pv
-        return None
-
-@dataclass
-class Treatment:
-
-    # A exclusive identifier to the treatment
-    #treatment_id : int
-
-    # The name of the treatment
-    name : str
-
-    # A description about the treatment
-    description : Optional[str] = None
-
-    operation : Callable[[Treatmentinput],Treatmentinput]
 
 class TreatmentCenter:
 
@@ -107,7 +46,7 @@ class TreatmentCenter:
             "att_pipeline" : (...)
         }   
     """
-    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]]
+    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([treatments[0]],PromptValidationCenter.PromptValidations)}
     '''
     @classmethod
     def get_treatment_by_id(cls, id : int):
@@ -120,6 +59,7 @@ class TreatmentCenter:
                 return tr
         return None
     '''
+    
     @classmethod
     def run_validations(cls, input : Treatmentinput, validations : list):
 
@@ -129,13 +69,12 @@ class TreatmentCenter:
             if not validation.operation(input):
                 ok = False
                 break
-
         return ok
 
     @classmethod
     def run_mandatory_treatments(cls, input : Treatmentinput):
         for treatment in cls.mandatory_treatments:
-            input = treatment(input)
+            input = treatment.operation(input)
         return input
 
 
@@ -160,8 +99,9 @@ class TreatmentCenter:
                 if cls.run_validations(input=input_, validations=validations):
                     return input_
                 
-                input_ = treatment.operation(input) 
-                input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+                if treatment:
+                    input_ = treatment.operation(input) 
+                    input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
 
         # Just returned it because dont really know what to do when nothing goes right 
         return input

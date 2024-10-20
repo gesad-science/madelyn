@@ -1,0 +1,4 @@
+import os
+
+COMPREHENSION_SERVICE_URL = os.environ.get("COMPREHENSION_SERVICE_URL")
+QA_SERVICE_URL = os.environ.get("QA_SERVICE_URL")

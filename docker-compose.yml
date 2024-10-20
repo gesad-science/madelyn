@@ -51,7 +51,19 @@ services:
     ports:
       - "7000:7000"
     restart: always
+
+  llm_independent_middleware:
+    build:
+      context: ./llm_middleware_api
+      dockerfile: Dockerfile
+    environment:
+      - COMPREHENSION_SERVICE_URL=http://comprehension_api:7000/query/comprehension
+      - QA_SERVICE_URL=http://llm_cluster:8000/models
+    ports:
+      - "8080:8080"
+    container_name: llm_middleware_api
+    restart: always
+
 volumes: 
   arangodb-data:
   ollama:
-  
