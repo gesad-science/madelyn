@@ -1,5 +1,5 @@
 import requests
-from src.interpretation_functions.config import COMPREHENSION_API_URL
+from src.interpretation_functions.config import COMPREHENSION_API_URL, LIM_API_URL
 from src.llm.LLModel import LLModel, PromptType
 from src.llm.qa_service import QAService
 from enum import Enum
@@ -20,9 +20,9 @@ class Interpretation_module:
         self.user_msg = user_msg
         self.model = model
         self.tokens = self.generate_tokens_classification()
+        self.attributes = {}
         self.intent = self.get_intent()
         self.entity = self.get_entity()
-        self.attributes = {}
         self.get_attributes()
 
     def generate_tokens_classification(self):
@@ -34,6 +34,34 @@ class Interpretation_module:
                 }
         response = requests.post(COMPREHENSION_API_URL, json=data)
         return response.json()['data']
+    
+    def call_lim(self, request : str, attribute_key : str, attribute_value : str):
+        data= {
+            'user_input': self.user_msg,
+            'key' : attribute_key,
+            'value' : attribute_value,
+            'processed_atts' : self.attributes,
+            'model_name' : self.model.name,
+            'current_entity' : None,
+            'current_intent' : None
+        }
+        match(request):
+            case 'intent':
+                url = LIM_API_URL + '/intent'
+                response = requests.post(url, json=data)
+                return response
+            case 'entity':
+                url = LIM_API_URL + '/entity'
+                data['current_intent'] = self.intent.__str__()
+                response = requests.post(url, json=data)
+                return response
+            case 'attribute':
+                url = LIM_API_URL + '/attributes'
+                data['current_intent'] = self.intent
+                data['current_entity'] = self.entity
+                response = requests.post(url, json=data)
+                return response.json()['value']
+        
 
 
     def get_intent(self):
@@ -105,8 +133,10 @@ class Interpretation_module:
             response = response['response']
 
             # while lim is not ready, make some treatments here
-            response = re.sub(r'^\s+|\s+$', '', response)
-            response = response.lower()
+            print(response)
+            response = self.call_lim(request='entity', attribute_key='', attribute_value=response)
+            response = response.json()['value']
+            print(response)
 
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
@@ -123,6 +153,7 @@ class Interpretation_module:
             find_attribute = None
 
             for token in self.tokens:
+                print(token)
                 if find_attribute is None:
                     if token['entity'] == 'NOUN' and token['word'] != self.entity: # or if the word is a known attribute key --but not implemented yet--
 
@@ -143,9 +174,8 @@ class Interpretation_module:
                                                                 )
                         find_attribute = find_attribute['response']
 
-                        # while lim is not ready, make some treatments here
-                        find_attribute = re.sub(r'^\s+|\s+$', '', find_attribute)
-                        find_attribute = find_attribute.lower()
+                        find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, attribute_value=find_attribute)
+                        print(find_attribute)
 
                         self.attributes[attribute_key] = find_attribute
                 else:

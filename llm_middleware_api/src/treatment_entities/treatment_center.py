@@ -16,7 +16,8 @@ class PromptValidationCenter:
             PromptValidation(name='entity_validation', description='checks if the answer is equal to the entity found', operation=entity_test),
             PromptValidation(name='ignoring_validation', description='checks if the answer is ignoring some important information', operation=ignoring_test),
             PromptValidation(name='float_validation', description='checks if the wanted value is a float value, and then discover if the model correctly find the value or only the integer part', operation=float_test),
-            PromptValidation(name='char_validation', description='checks if the answer has some noise characters', operation=char_test)
+            PromptValidation(name='char_validation', description='checks if the answer has some noise characters', operation=char_test),
+            PromptValidation(name='in_msg_test', description='tests if the result is in the user message', operation=in_msg_test)
     ]
 
 class TreatmentCenter:
@@ -46,7 +47,8 @@ class TreatmentCenter:
             "att_pipeline" : (...)
         }   
     """
-    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([treatments[0]],PromptValidationCenter.PromptValidations)}
+    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([treatments[0]],PromptValidationCenter.PromptValidations),
+                                                                                      'entity_pipeline' : ([], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]])}
     '''
     @classmethod
     def get_treatment_by_id(cls, id : int):

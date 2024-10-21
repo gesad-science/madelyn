@@ -35,6 +35,18 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
     words = input.value.split(' ')
     words = list(filter(lambda x: x != '', words))
+
+    if input.key == '': # returning a single word (it may be an entity or intent case)
+        for word in words:
+            single_word = ' ' + word.lower().replace('\n', '') + ' '
+            if single_word in input.user_input:
+                input.value = single_word.strip()
+                return input
+        for word in words:
+            if word.lower() in input.user_input:
+                input.value = word.strip()
+                return input
+
     fragment_short = ' ' + input.user_input[input.user_input.find(input.key) + len(input.key):] + ' '
     fragment_short = ' ' + fragment_short.strip() + ' '
 
