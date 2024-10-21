@@ -4,6 +4,8 @@ from src.llm.LLModel import LLModel, PromptType
 from src.llm.qa_service import QAService
 from enum import Enum
 
+from src.db.arango_model_storage import ArangoModelStorage
+
 import re
 
 class Intent(Enum):
@@ -15,10 +17,10 @@ class Intent(Enum):
 class Interpretation_module:
     def __init__(self,
                  user_msg : str,
-                 model : LLModel
+                 model_name : str
                  ):
         self.user_msg = user_msg
-        self.model = model
+        self.model = ArangoModelStorage.get_model(model_name)
         self.tokens = self.generate_tokens_classification()
         self.attributes = {}
         self.intent = self.get_intent()
