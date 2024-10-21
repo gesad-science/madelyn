@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	//"github.com/gesad-science/login-api/types"
 	"github.com/gesad-science/login-api/service/user"
 )
 
@@ -26,7 +27,8 @@ func (s *APIServer) Run() error {
 	router := mux.NewRouter()
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
-	userHandler := user.NewHandler()
+  userStore := user.NewStore(s.db)
+	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(subrouter)
 
 	log.Println("Listening on", s.addr)
