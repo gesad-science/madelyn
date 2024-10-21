@@ -19,8 +19,9 @@ class Interpretation_module:
                  user_msg : str,
                  model_name : str
                  ):
+        storage = ArangoModelStorage(url='http://localhost:8529',username='root', password='123')
         self.user_msg = user_msg
-        self.model = ArangoModelStorage.get_model(model_name)
+        self.model = storage.get_model(name=model_name)
         self.tokens = self.generate_tokens_classification()
         self.attributes = {}
         self.intent = self.get_intent()

@@ -10,6 +10,8 @@ from src.models.query import Query
 from src.decorators.business_rule_exception_check import business_rule_exception_check
 from src.llm.qa_service import QAService
 
+from src.interpretation_functions.interpretation_functions import Interpretation_module
+
 models_router = APIRouter()
 
 @models_router.get('/models', tags=["Model" ])
@@ -73,3 +75,8 @@ def query(name : str, prompt_input : Query):
          'data' : ans
     }
         
+@models_router.post('/models/{model_name}/interpret/{user_msg}', tags=["interpretation"])
+@business_rule_exception_check
+def interpret_msg(model_name : str, user_msg : str):
+     im = Interpretation_module(user_msg=user_msg, model_name=model_name)
+     return im.extract_data()
