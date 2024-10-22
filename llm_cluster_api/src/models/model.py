@@ -1,18 +1,20 @@
 from src.llm.query_validator import QueryValidator
 from src.models.prompt import Prompt
-from src.llm.LLModelQA import LLModelQA
+from src.llm.LLModel import LLModel
 from src.exceptions.business_rule_exception import BusinessRuleException
-
+from src.models.prompt_list import PromptList
 from pydantic import BaseModel
 from uuid import uuid4
 
 class Model(BaseModel):
     name : str
-    default_prompt : Prompt
-    prompt_alternatives : list[Prompt] = []
+    intent : PromptList
+    entity : PromptList
+    attribute : PromptList
+    filter : PromptList
     validations : list[int] = []
 
-    def to_LLModelQA(self) -> LLModelQA:
+    def to_LLModel(self) -> LLModel:
         illegal_validations = []
         for validation in self.validations:
             if not QueryValidator.is_valid(validation):
@@ -20,9 +22,11 @@ class Model(BaseModel):
         if len(illegal_validations) > 0:
             raise BusinessRuleException(detail=f"These are not valid validation numbers {illegal_validations}")
 
-        return LLModelQA(
+        return LLModel(
             name= self.name,
-            default_prompt= self.default_prompt.to_PromptTemplate(uuid4()),
+            attribute=self.attribute.to_PromptLine(),
+            intent=self.intent.to_PromptLine(),
+            entity=self.entity.to_PromptLine(),
+            filter=self.filter.to_PromptLine(),
             validations= self.validations,
-            prompt_alternatives= [ prompt.to_PromptTemplate(uuid4()) for prompt in self.prompt_alternatives]
         )

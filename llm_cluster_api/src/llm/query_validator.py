@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable
 
-# from src.llm.LLModelQA import LLModelQA
+# from src.llm.LLModel import LLModel
 
 from src.llm.validation_functions.validate_variables import validate_variables
 from src.llm.prompt_template import PromptTemplate
