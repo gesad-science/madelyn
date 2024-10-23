@@ -46,6 +46,7 @@ services:
     build:
       context: ./comprehension_api
       dockerfile: Dockerfile
+    container_name: madelyn-comprehension_api
     environment:
       - HUGGING_FACE_BASE_URL=https://api-inference.huggingface.co/
     ports:
