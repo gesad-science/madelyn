@@ -5,17 +5,26 @@ from src.llm.prompt_line import PromptLine
 # from src.utils.singleton import Singleton
 from src.llm.LLModel import LLModel
 from uuid import UUID
+from src.consts import COUCHDB_PASSWORD, COUCHDB_DATABSE_NAME, COUCHDB_URL, COUCHDB_USERNAME
 from couchdb import Server
 from couchdb.http import ResourceConflict, ResourceNotFound
 
-# from src.consts import ARANGODB_COLLECTION_NAME, ARANGODB_DATABASE_NAME, ARANGODB_PASSWORD, ARANGODB_URL, ARANGODB_USERNAME
-"""
-Acourding to a fast research pyarango is not thread safe by default, so
-initially im just going to init a new connection for each db interaction
-"""
+
 class CouchModelStorage:
 
-    def __init__(self, url = "http://localhost:5984", user = "admin", password = "123", db_name = "madelyn_model_db") -> None:
+    def __init__(
+                 self, url = COUCHDB_URL, 
+                 user = COUCHDB_USERNAME, 
+                 password = COUCHDB_PASSWORD, 
+                 db_name = COUCHDB_DATABSE_NAME
+                ) -> None:
+        if user is None:
+            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch username is mandatory")
+        if password is None:
+            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch password is mandatory")
+        if db_name is None:
+            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch db name is mandatory")
+        
         self.server = Server(url)
         self.server.resource.credentials = (user, password)
         self.db_name = db_name
@@ -35,11 +44,11 @@ class CouchModelStorage:
         return res[0] if len(res) == 1 else None
 
     @staticmethod
-    def __couch_doc_to_PromptTemplate(arango_doc : dict) -> PromptTemplate: 
+    def __couch_doc_to_PromptTemplate(couch_doc : dict) -> PromptTemplate: 
         return PromptTemplate(
-            template= arango_doc["template"],
-            args= arango_doc["args"],
-            id= UUID(arango_doc["id"])
+            template= couch_doc["template"],
+            args= couch_doc["args"],
+            id= UUID(couch_doc["id"])
         )
 
     @staticmethod
