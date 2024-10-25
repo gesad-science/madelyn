@@ -1,5 +1,5 @@
 from .entities import Treatmentinput
-from ..services import token_classification_service
+from ..utils.services import token_classification_service
 from src.config import COMPREHENSION_SERVICE_URL
 
 # from entities import Promptvalidation, Treatmentinput

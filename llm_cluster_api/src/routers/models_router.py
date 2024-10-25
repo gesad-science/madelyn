@@ -10,7 +10,7 @@ from src.models.query import Query
 from src.decorators.business_rule_exception_check import business_rule_exception_check
 from src.llm.qa_service import QAService
 
-from src.interpretation_functions.interpretation_functions import Interpretation_module
+from src.interpretation_functions.interpretation_functions import MessageDecoder
 
 models_router = APIRouter()
 
@@ -78,5 +78,5 @@ def query(name : str, prompt_input : Query):
 @models_router.post('/interpret/{user_msg}', tags=["interpretation"])
 @business_rule_exception_check
 def interpret_msg(user_msg : str):
-     im = Interpretation_module(user_msg=user_msg)
+     im = MessageDecoder(user_msg=user_msg)
      return im.extract_data()

@@ -24,13 +24,15 @@ class TreatmentCenter:
 
     # A list where all treatments are going to be registered
     treatments : list[Treatment] = [
-        Treatment(name='new_request_treatment', description='A flag to indicate to the system to execute the treatments', operation=request_new_answer)
+        Treatment(name='new_request_treatment', description='A flag to indicate to the system to execute the treatments', operation=request_new_answer),
+        Treatment(name='extract_entity', description='Searchs for the first noun in the user message', operation=extract_entity)
     ]
 
     # List of treatments that are made every tive before the regular ones
     mandatory_treatments : list[Treatment] = [
         Treatment(name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter),
-        Treatment(name='entity_filter', description='This treatment gets the first interception between the response from the model and the user input. it returns a single word as response', operation=entity_filter)
+        Treatment(name='entity_filter', description='This treatment gets the first interception between the response from the model and the user input. it returns a single word as response', operation=entity_filter),
+        Treatment(name='intent_filter', description='Extracts the exact intent string from the model response', operation=intent_filter)
     ]
 
     """ 
@@ -50,7 +52,9 @@ class TreatmentCenter:
     """
     # mandatory treatments, regular treatments and validations
     treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[treatments[0]],PromptValidationCenter.PromptValidations),
-                                                                                      'entity_pipeline' : ([mandatory_treatments[1]], [], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]])}
+                                                                                      'entity_pipeline' : ([mandatory_treatments[1]], [treatments[1]], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]]),
+                                                                                      'intent_pipeline' : ([mandatory_treatments[2]], [], [])
+                                                                                      }
     '''
     @classmethod
     def get_treatment_by_id(cls, id : int):
@@ -69,10 +73,11 @@ class TreatmentCenter:
 
         ok = True # Flag to show if the input passed in all if its validations
 
-        for validation in validations:
-            if not validation.operation(input):
-                ok = False
-                break
+        if validations:
+            for validation in validations:
+                if not validation.operation(input):
+                    ok = False
+                    break
         return ok
 
     @classmethod

@@ -1,5 +1,6 @@
 from .entities import Treatmentinput
-from ..services import qa_service, token_classification_service
+from ..utils.services import qa_service, token_classification_service
+from ..utils.utils import clean_string
 from src.config import QA_SERVICE_URL
 
 '''
@@ -86,12 +87,26 @@ def entity_filter(input : Treatmentinput) -> Treatmentinput:
     for token in tokens:
         if token['entity'] == 'NOUN':
             input.value = token['word']
-            return input
+    return input
+        
         
 
-def clean_string(string : str) -> str:
-    return string.replace('\n', '').replace('=', '').replace(',', '').replace('.', '') 
+def extract_entity(input : Treatmentinput) -> Treatmentinput:
+    tokens = token_classification_service(input.user_input)
+    for token in tokens:
+        if token['entity'] == 'NOUN':
+            input.value = token['word']
+    return input
+        
+def intent_filter(input : Treatmentinput) -> Treatmentinput:
+    value = input.value.lower()
+    print('value')
+    print(value)
 
-
-
+    keywords = ['read', 'create', 'delete', 'update']
+    for keyword in keywords:
+        if keyword in value:
+            print(keyword)
+            input.value = keyword
+    return input
 

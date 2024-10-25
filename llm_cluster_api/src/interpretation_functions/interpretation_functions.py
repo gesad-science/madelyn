@@ -14,7 +14,7 @@ class Intent(Enum):
     UPDATE = 'update',
     DELETE = 'delete'
 
-class Interpretation_module:
+class MessageDecoder:
     def __init__(self,
                  user_msg : str,
                  model_name : str = DEFAULT_MODEL
@@ -41,11 +41,11 @@ class Interpretation_module:
         response = requests.post(COMPREHENSION_API_URL, json=data)
         return response.json()['data']
     
-    def call_lim(self, request : str, attribute_key : str, attribute_value : str):
+    def call_lim(self, request : str, value : str, attribute_key : str = ''):
         data= {
             'user_input': self.user_msg,
             'key' : attribute_key,
-            'value' : attribute_value,
+            'value' : value,
             'processed_atts' : self.attributes,
             'model_name' : self.model.name,
             'current_entity' : None,
@@ -55,12 +55,12 @@ class Interpretation_module:
             case 'intent':
                 url = LIM_API_URL + '/intent'
                 response = requests.post(url, json=data)
-                return response
+                return response.json()['value']
             case 'entity':
                 url = LIM_API_URL + '/entity'
                 data['current_intent'] = self.intent.__str__()
                 response = requests.post(url, json=data)
-                return response
+                return response.json()['value']
             case 'attribute':
                 url = LIM_API_URL + '/attributes'
                 data['current_intent'] = self.intent
@@ -85,9 +85,7 @@ class Interpretation_module:
             response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.INTENT, model=self.model)
             response = response['response']
 
-            # while lim is not ready, make some treatments here
-            response = re.sub(r'^\s+|\s+$', '', response)
-            response = response.lower()
+            response = self.call_lim(request='intent', value=response)
 
             match(response):
                 case 'create':
@@ -138,8 +136,7 @@ class Interpretation_module:
 
             response = response['response']
 
-            response = self.call_lim(request='entity', attribute_key='', attribute_value=response)
-            response = response.json()['value']
+            response = self.call_lim(request='entity', attribute_key='', value=response)
 
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
@@ -176,7 +173,7 @@ class Interpretation_module:
                                                                 )
                         find_attribute = find_attribute['response']
 
-                        find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, attribute_value=find_attribute)
+                        find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, value=find_attribute)
 
                         self.attributes[attribute_key] = find_attribute
                 else:

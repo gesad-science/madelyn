@@ -1,4 +1,4 @@
-from .config import COMPREHENSION_SERVICE_URL, QA_SERVICE_URL
+from ..config import COMPREHENSION_SERVICE_URL, QA_SERVICE_URL
 import requests
 
 def token_classification_service(text : str):
