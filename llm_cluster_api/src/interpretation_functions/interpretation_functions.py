@@ -1,6 +1,6 @@
 import requests
-from src.interpretation_functions.config import COMPREHENSION_API_URL, LIM_API_URL
-from src.llm.LLModel import LLModel, PromptType
+from src.interpretation_functions.config import COMPREHENSION_API_URL, LIM_API_URL, DEFAULT_MODEL
+from src.llm.LLModel import PromptType
 from src.llm.qa_service import QAService
 from enum import Enum
 
@@ -17,12 +17,15 @@ class Intent(Enum):
 class Interpretation_module:
     def __init__(self,
                  user_msg : str,
-                 model_name : str
+                 model_name : str = DEFAULT_MODEL
                  ):
+        
         storage = ArangoModelStorage(url='http://arangodb-instance:8529',username='root', password='123')
-        self.user_msg = user_msg
         self.model = storage.get_model(model_name)
+
+        self.user_msg = user_msg
         self.tokens = self.generate_tokens_classification()
+
         self.attributes = {}
         self.intent = self.get_intent()
         self.entity = self.get_entity()
@@ -135,11 +138,8 @@ class Interpretation_module:
 
             response = response['response']
 
-            # while lim is not ready, make some treatments here
-            print(response)
             response = self.call_lim(request='entity', attribute_key='', attribute_value=response)
             response = response.json()['value']
-            print(response)
 
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
@@ -156,7 +156,6 @@ class Interpretation_module:
             find_attribute = None
 
             for token in self.tokens:
-                print(token)
                 if find_attribute is None:
                     if token['entity'] == 'NOUN' and token['word'] != self.entity: # or if the word is a known attribute key --but not implemented yet--
 
@@ -178,7 +177,6 @@ class Interpretation_module:
                         find_attribute = find_attribute['response']
 
                         find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, attribute_value=find_attribute)
-                        print(find_attribute)
 
                         self.attributes[attribute_key] = find_attribute
                 else:

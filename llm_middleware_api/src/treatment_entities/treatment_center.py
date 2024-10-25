@@ -29,7 +29,8 @@ class TreatmentCenter:
 
     # List of treatments that are made every tive before the regular ones
     mandatory_treatments : list[Treatment] = [
-        Treatment(name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter)
+        Treatment(name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter),
+        Treatment(name='entity_filter', description='This treatment gets the first interception between the response from the model and the user input. it returns a single word as response', operation=entity_filter)
     ]
 
     """ 
@@ -47,8 +48,9 @@ class TreatmentCenter:
             "att_pipeline" : (...)
         }   
     """
-    treatment_lines : dict[str, tuple[ list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([treatments[0]],PromptValidationCenter.PromptValidations),
-                                                                                      'entity_pipeline' : ([], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]])}
+    # mandatory treatments, regular treatments and validations
+    treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[treatments[0]],PromptValidationCenter.PromptValidations),
+                                                                                      'entity_pipeline' : ([mandatory_treatments[1]], [], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]])}
     '''
     @classmethod
     def get_treatment_by_id(cls, id : int):
@@ -74,8 +76,8 @@ class TreatmentCenter:
         return ok
 
     @classmethod
-    def run_mandatory_treatments(cls, input : Treatmentinput):
-        for treatment in cls.mandatory_treatments:
+    def run_mandatory_treatments(cls, treatments : list, input : Treatmentinput):
+        for treatment in treatments:
             input = treatment.operation(input)
         return input
 
@@ -83,10 +85,9 @@ class TreatmentCenter:
     @classmethod
     def run_line(cls, line_name : str, input : Treatmentinput):
 
-        treatments, validations = cls.treatment_lines[line_name]
-        
+        mandatory_treatments, treatments, validations = cls.treatment_lines[line_name]
         # executing mandatory treatments
-        input = cls.run_mandatory_treatments(input)
+        input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input)
 
         # Making a deepcopy just to be sure that any treatment made with model A
         # is passed to model B input 
@@ -103,7 +104,7 @@ class TreatmentCenter:
                 
                 if treatment:
                     input_ = treatment.operation(input) 
-                    input_ = cls.run_mandatory_treatments(input_) # executing mandatory treatments for the new input.
+                    input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input_) # executing mandatory treatments for the new input.
 
         # Just returned it because dont really know what to do when nothing goes right 
         return input

@@ -1,5 +1,5 @@
 from .entities import Treatmentinput
-import requests
+from ..services import token_classification_service
 from src.config import COMPREHENSION_SERVICE_URL
 
 # from entities import Promptvalidation, Treatmentinput
@@ -18,16 +18,6 @@ from src.config import COMPREHENSION_SERVICE_URL
 
 
 ##############
-
-def token_classification_service(text : str):
-    data = {
-        "func": "TOKEN_CLASSIFICATION",
-        "inputs": [
-            text
-        ]
-    }
-    response = requests.post(COMPREHENSION_SERVICE_URL, json=data)
-    return response.json()['data']
 
 def len_test(input : Treatmentinput) -> bool:
     value = input.value

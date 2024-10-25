@@ -75,8 +75,8 @@ def query(name : str, prompt_input : Query):
          'data' : ans
     }
         
-@models_router.post('/models/{model_name}/interpret/{user_msg}', tags=["interpretation"])
+@models_router.post('/interpret/{user_msg}', tags=["interpretation"])
 @business_rule_exception_check
-def interpret_msg(model_name : str, user_msg : str):
-     im = Interpretation_module(user_msg=user_msg, model_name=model_name)
+def interpret_msg(user_msg : str):
+     im = Interpretation_module(user_msg=user_msg)
      return im.extract_data()
