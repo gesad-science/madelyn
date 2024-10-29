@@ -100,13 +100,10 @@ def extract_entity(input : Treatmentinput) -> Treatmentinput:
         
 def intent_filter(input : Treatmentinput) -> Treatmentinput:
     value = input.value.lower()
-    print('value')
-    print(value)
 
     keywords = ['read', 'create', 'delete', 'update']
     for keyword in keywords:
         if keyword in value:
-            print(keyword)
             input.value = keyword
     return input
 

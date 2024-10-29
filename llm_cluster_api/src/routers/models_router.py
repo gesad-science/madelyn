@@ -10,7 +10,7 @@ from src.models.query import Query
 from src.decorators.business_rule_exception_check import business_rule_exception_check
 from src.llm.qa_service import QAService
 
-from src.interpretation_functions.interpretation_functions import MessageDecoder
+from ..message_decoder.message_decoder import MessageDecoder
 
 models_router = APIRouter()
 

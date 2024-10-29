@@ -1,5 +1,5 @@
 import requests
-from src.interpretation_functions.config import COMPREHENSION_API_URL, LIM_API_URL, DEFAULT_MODEL
+from src.message_decoder.config import COMPREHENSION_API_URL, LIM_API_URL, DEFAULT_MODEL
 from src.llm.LLModel import PromptType
 from src.llm.qa_service import QAService
 from enum import Enum
@@ -39,7 +39,8 @@ class MessageDecoder:
                 ]
                 }
         response = requests.post(COMPREHENSION_API_URL, json=data)
-        return response.json()['data']
+        response = response.json()['data']
+        return response
     
     def call_lim(self, request : str, value : str, attribute_key : str = ''):
         data= {
