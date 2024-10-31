@@ -25,7 +25,16 @@ class LLMProviderStorage(ABC):
     def set_default_provider(cls, default):
         cls.__default = default
     
+    @classmethod
+    def iter_providers(cls):
+        for provider in cls.__providers.values():
+            yield provider
     
+    @classmethod
+    def list_provider(cls):
+        return list(cls.iter_providers())
+    
+
     @classmethod
     def get_provider_of(cls, model):
         for provider in cls.__providers.values():

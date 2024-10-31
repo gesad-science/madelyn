@@ -12,12 +12,12 @@ validations_router = APIRouter()
 def get_validations():
     return QueryValidator.list_all_validations()
 
-@validations_router.get('/models/{name}/validations', tags=["Validation"])
+@validations_router.post('/models/validations/get', tags=["Validation"])
 @business_rule_exception_check
 def get_validations_from_model(name : str):
     return QueryValidator.list_validations(ArangoModelStorage().get_model(name).validations)
 
-@validations_router.put('/models/{name}/validations',tags=["Validation" ])
+@validations_router.put('/models/validations',tags=["Validation" ])
 @business_rule_exception_check
 def delete_validations(name : str, validations : list[int]):
     model_storage = ArangoModelStorage()
@@ -26,7 +26,7 @@ def delete_validations(name : str, validations : list[int]):
     model_storage.update_model(model)
     return "Ok"
 
-@validations_router.post('/models/{name}/validations', tags=["Validation"])
+@validations_router.post('/models/validations/', tags=["Validation"])
 @business_rule_exception_check
 def post_validations(name : str, validations : list[int]):
     model_storage = ArangoModelStorage()

@@ -8,17 +8,17 @@ from src.llm.LLModel import PromptType
 
 prompts_router = APIRouter()
 
-@prompts_router.get('/models/{name}/prompts', tags=["Prompt" ])
+@prompts_router.post('/models/prompts/get', tags=["Prompt" ])
 @business_rule_exception_check
 def get_prompts(name : str):
     return ArangoModelStorage().get_model(name).list_prompts()
 
-@prompts_router.get('/models/{name}/prompts/{prompt_uid}', tags=["Prompt" ])
+@prompts_router.post('/models/prompts/{prompt_uid}', tags=["Prompt" ])
 @business_rule_exception_check
 def get_single_prompt(name : str, prompt_uid : UUID):
     return ArangoModelStorage().get_model(name).get_prompt(prompt_uid)
 
-@prompts_router.post('/models/{name}/prompts', tags=["Prompt"])
+@prompts_router.post('/models/prompts', tags=["Prompt"])
 @business_rule_exception_check
 def post_prompts(name:str, prompts : list[Prompt], prompt_type : PromptType):
     model_storage = ArangoModelStorage()
@@ -35,7 +35,7 @@ def post_prompts(name:str, prompts : list[Prompt], prompt_type : PromptType):
     model_storage.update_model(model)
     return new_uids
 
-@prompts_router.put('/models/{name}/prompts', tags=["Prompt" ])
+@prompts_router.put('/models/prompts', tags=["Prompt" ])
 @business_rule_exception_check
 def delete_prompts(name : str, prompt_uids : list[UUID]):
     model_storage = ArangoModelStorage()
@@ -44,7 +44,7 @@ def delete_prompts(name : str, prompt_uids : list[UUID]):
     model_storage.update_model(model)
     return "Ok"
 
-@prompts_router.put('/models/{name}/prompts/main/{prompt_uid}', tags=["Prompt"])
+@prompts_router.put('/models/prompts/main/{prompt_uid}', tags=["Prompt"])
 @business_rule_exception_check
 def swap_main_prompt(name : str, prompt_uid : UUID):
     model_storage = ArangoModelStorage()
@@ -53,7 +53,7 @@ def swap_main_prompt(name : str, prompt_uid : UUID):
     model_storage.update_model(model)
     return "Ok"
 
-@prompts_router.put('/models/{name}/prompts/main', tags=["Prompt"])
+@prompts_router.put('/models/prompts/main', tags=["Prompt"])
 @business_rule_exception_check
 def swap_main_prompt_to_new(name : str, prompt : Prompt):
     new_uid = uuid.uuid4()
