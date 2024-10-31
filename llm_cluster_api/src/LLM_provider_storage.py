@@ -1,13 +1,16 @@
-from src.llm_providers.base_provider import BaseProvider
 from src.llm_providers.ollama_provider import OllamaProvider
+from src.llm_providers.base_provider import BaseProvider
+from src.consts import OLLAMA_BASE_URL, HUGGINGFACE_BASE_URL
 from abc import ABC
-import os
+from src.llm_providers.huggingface_provider import HuggingFaceProvider
 
-from src.consts import OLLAMA_BASE_URL
+from src.exceptions.business_rule_exception import BusinessRuleException
+
+import os
 
 class LLMProviderStorage(ABC):
     __providers : dict[str, BaseProvider] = {
-        # 'bedrock' : BedrockProvider(),
+        'huggingface' : HuggingFaceProvider(HUGGINGFACE_BASE_URL),
         'ollama' : OllamaProvider(OLLAMA_BASE_URL),
     }
 
@@ -22,6 +25,17 @@ class LLMProviderStorage(ABC):
     def set_default_provider(cls, default):
         cls.__default = default
     
+    
+    @classmethod
+    def get_provider_of(cls, model):
+        for provider in cls.__providers.values():
+                if provider.has_model(model):
+                    return provider
+                
+        raise BusinessRuleException(detail=f"There is no provider that supports {model}")
+    
+    
+
     @classmethod
     def get_default_provider(cls) -> BaseProvider:
         return cls.get_provider(cls.__default)
