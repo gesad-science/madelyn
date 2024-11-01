@@ -10,13 +10,15 @@ class Treatmentinput:
     
 
     # Passing here the name of the desired model if it is needed
-    model_name : Optional[str]
+    #model_name : Optional[str]
 
     #not defined yet
 
     user_input : str
     current_entity : Optional[str]
     current_intent : Optional[str]
+
+    acceptable_answer : bool = True
 
 #########################
 

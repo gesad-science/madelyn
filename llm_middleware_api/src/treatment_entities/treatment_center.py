@@ -24,8 +24,7 @@ class TreatmentCenter:
 
     # A list where all treatments are going to be registered
     treatments : list[Treatment] = [
-        Treatment(name='new_request_treatment', description='A flag to indicate to the system to execute the treatments', operation=request_new_answer),
-        Treatment(name='extract_entity', description='Searchs for the first noun in the user message', operation=extract_entity)
+        Treatment(name='extract_entity', description='Searchs for the first noun in the user message', operation=extract_entity),
     ]
 
     # List of treatments that are made every tive before the regular ones
@@ -51,8 +50,8 @@ class TreatmentCenter:
         }   
     """
     # mandatory treatments, regular treatments and validations
-    treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[treatments[0]],PromptValidationCenter.PromptValidations),
-                                                                                      'entity_pipeline' : ([mandatory_treatments[1]], [treatments[1]], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]]),
+    treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[],PromptValidationCenter.PromptValidations),
+                                                                                      'entity_pipeline' : ([mandatory_treatments[1]], [treatments[0]], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]]),
                                                                                       'intent_pipeline' : ([mandatory_treatments[2]], [], [])
                                                                                       }
     '''
@@ -98,18 +97,20 @@ class TreatmentCenter:
         # is passed to model B input 
         input_ = deepcopy(input)
 
-        # Adding None at the end of the treatments so it repeat one more that
-        # to validate the last treatment changes
-        for treatment in treatments + [None]:
+        if input.value == '':
+            # Adding None at the end of the treatments so it repeat one more that
+            # to validate the last treatment changes
+            for treatment in treatments + [None]:
 
-            if input_:
+                if input_:
 
-                if cls.run_validations(input=input_, validations=validations):
-                    return input_
-                
-                if treatment:
-                    input_ = treatment.operation(input) 
-                    input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input_) # executing mandatory treatments for the new input.
+                    if cls.run_validations(input=input_, validations=validations):
+                        return input_
+                    
+                    if treatment:
+                        input_ = treatment.operation(input) 
+                        input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input_) # executing mandatory treatments for the new input.
 
         # Just returned it because dont really know what to do when nothing goes right 
+        input.acceptable_answer = False
         return input

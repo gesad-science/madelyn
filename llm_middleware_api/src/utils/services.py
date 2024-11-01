@@ -10,7 +10,7 @@ def token_classification_service(text : str):
     }
     response = requests.post(COMPREHENSION_SERVICE_URL, json=data)
     return response.json()['data']
-
+'''
 def qa_service(variables : dict, model_name : str, prompt_type : str):
 
     url = QA_SERVICE_URL + f'/{model_name}/query'
@@ -21,4 +21,4 @@ def qa_service(variables : dict, model_name : str, prompt_type : str):
     }
     response = requests.post(url, json=data)
     return response.json()
-
+'''

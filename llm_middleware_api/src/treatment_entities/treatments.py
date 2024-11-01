@@ -1,25 +1,7 @@
 from .entities import Treatmentinput
-from ..utils.services import qa_service, token_classification_service
+from ..utils.services import token_classification_service
 from ..utils.utils import clean_string
 from src.config import QA_SERVICE_URL
-
-'''
-def intent_filter(input : Treatmentinput, model : LLModelQA) -> Treatmentinput:
-
-    value = input.value
-
-    options = [' Yes ', ' No ', ' CREATE ', ' READ ', ' UPDATE ', ' DELETE ']
-    for option in options:
-        if option in value:
-            return re.sub(r'^\s+|\s+$', '', option)
-            
-        #trying to find anyway
-
-        for option in options:
-            if re.sub(r'^\s+|\s+$', '', option) in value:
-                return re.sub(r'^\s+|\s+$', '', option)
-        return None
-'''
 
 def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
@@ -51,7 +33,7 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
     input.value = final_answer.strip()
 
     return input
-
+'''
 def request_new_answer(input : Treatmentinput) -> Treatmentinput:
 
     fragment_short_idx = input.user_input.find(input.key)
@@ -66,7 +48,7 @@ def request_new_answer(input : Treatmentinput) -> Treatmentinput:
                                  prompt_type='attribute')
     input.value = response['data']['response']
     return input
-
+'''
 def entity_filter(input : Treatmentinput) -> Treatmentinput:
 
     words = input.value.split(' ')

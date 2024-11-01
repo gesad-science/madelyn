@@ -48,26 +48,21 @@ class MessageDecoder:
             'key' : attribute_key,
             'value' : value,
             'processed_atts' : self.attributes,
-            'model_name' : self.model.name,
             'current_entity' : None,
             'current_intent' : None
         }
         match(request):
             case 'intent':
                 url = LIM_API_URL + '/intent'
-                response = requests.post(url, json=data)
-                return response.json()['value']
             case 'entity':
                 url = LIM_API_URL + '/entity'
                 data['current_intent'] = self.intent.__str__()
-                response = requests.post(url, json=data)
-                return response.json()['value']
             case 'attribute':
                 url = LIM_API_URL + '/attributes'
                 data['current_intent'] = self.intent
                 data['current_entity'] = self.entity
-                response = requests.post(url, json=data)
-                return response.json()['value']
+        response = requests.post(url, json=data)
+        return response.json()
         
 
 
@@ -86,7 +81,7 @@ class MessageDecoder:
             response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.INTENT, model=self.model)
             response = response['response']
 
-            response = self.call_lim(request='intent', value=response)
+            response = self.call_lim(request='intent', value=response)['value']
 
             match(response):
                 case 'create':
@@ -137,7 +132,7 @@ class MessageDecoder:
 
             response = response['response']
 
-            response = self.call_lim(request='entity', attribute_key='', value=response)
+            response = self.call_lim(request='entity', attribute_key='', value=response)['value']
 
             # then use the text similarity service to compare the candidates with the model response to choose the better one 
             ### not implemented yet ###
@@ -173,8 +168,7 @@ class MessageDecoder:
                                                                        prompt_type=PromptType.ATTRIBUTE, model=self.model
                                                                 )
                         find_attribute = find_attribute['response']
-
-                        find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, value=find_attribute)
+                        find_attribute = self.call_lim(request='attribute', attribute_key=attribute_key, value=find_attribute)['value']
 
                         self.attributes[attribute_key] = find_attribute
                 else:
