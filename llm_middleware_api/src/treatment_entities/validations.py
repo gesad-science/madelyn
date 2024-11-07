@@ -22,20 +22,19 @@ from src.config import COMPREHENSION_SERVICE_URL
 def len_test(input : Treatmentinput) -> bool:
     value = input.value
     if value:
-        if len(value) <= 0:
-            return False
-        return True
+        if len(value) > 0:
+            return True
     return False
 
 def key_test(input : Treatmentinput) -> bool:
-    value = input.value
     key = input.key
-    if key.lower().strip() == key.lower().strip():
+    value = input.value
+    if key.lower().strip() == value.lower().strip():
         return False
     return True
 
 def and_test(input : Treatmentinput) -> bool:
-    value = input.value
+    value = ' ' + input.value + ' '
     if ' and ' in value:
         return False
     return True
@@ -139,6 +138,7 @@ def char_test(input : Treatmentinput) -> bool: # should be increased in the futu
 
 def in_msg_test(input : Treatmentinput) -> bool:
     single_word = ' ' + input.value + ' '
-    if single_word in input.user_input:
+    message = ' ' + input.user_input.lower() + ' '
+    if single_word.lower() in message:
         return True
     return False

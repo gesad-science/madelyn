@@ -25,6 +25,7 @@ class TreatmentCenter:
     # A list where all treatments are going to be registered
     treatments : list[Treatment] = [
         Treatment(name='extract_entity', description='Searchs for the first noun in the user message', operation=extract_entity),
+        Treatment(name='extract_attribute', description='Gets the word following the attribute key in the message', operation=extract_attribute)
     ]
 
     # List of treatments that are made every tive before the regular ones
@@ -50,7 +51,7 @@ class TreatmentCenter:
         }   
     """
     # mandatory treatments, regular treatments and validations
-    treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[],PromptValidationCenter.PromptValidations),
+    treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[treatments[1]],PromptValidationCenter.PromptValidations),
                                                                                       'entity_pipeline' : ([mandatory_treatments[1]], [treatments[0]], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]]),
                                                                                       'intent_pipeline' : ([mandatory_treatments[2]], [], [])
                                                                                       }
@@ -88,28 +89,30 @@ class TreatmentCenter:
 
     @classmethod
     def run_line(cls, line_name : str, input : Treatmentinput):
-
         mandatory_treatments, treatments, validations = cls.treatment_lines[line_name]
         # executing mandatory treatments
         input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input)
+
+        if not input.complete_treatment:
+            return input
 
         # Making a deepcopy just to be sure that any treatment made with model A
         # is passed to model B input 
         input_ = deepcopy(input)
 
-        if input.value == '':
-            # Adding None at the end of the treatments so it repeat one more that
-            # to validate the last treatment changes
-            for treatment in treatments + [None]:
+        # Adding None at the end of the treatments so it repeat one more that
+        # to validate the last treatment changes
+        for treatment in treatments + [None]:
 
-                if input_:
+            if input_:
 
-                    if cls.run_validations(input=input_, validations=validations):
-                        return input_
-                    
-                    if treatment:
-                        input_ = treatment.operation(input) 
-                        input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input_) # executing mandatory treatments for the new input.
+                if cls.run_validations(input=input_, validations=validations):
+                    input_.acceptable_answer = True
+                    return input_
+                
+                if treatment:
+                    input_ = treatment.operation(input) 
+                    input = cls.run_mandatory_treatments(treatments=mandatory_treatments, input=input_) # executing mandatory treatments for the new input.
 
         # Just returned it because dont really know what to do when nothing goes right 
         input.acceptable_answer = False

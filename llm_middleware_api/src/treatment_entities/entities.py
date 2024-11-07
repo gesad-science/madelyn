@@ -20,6 +20,8 @@ class Treatmentinput:
 
     acceptable_answer : bool = True
 
+    complete_treatment : bool = True
+
 #########################
 
 

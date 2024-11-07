@@ -4,8 +4,8 @@ from ..utils.utils import clean_string
 from src.config import QA_SERVICE_URL
 
 def similarity_filter(input : Treatmentinput) -> Treatmentinput:
-
-    words = input.value.split(' ')
+    value = input.value
+    words = value.split(' ')
     words = list(filter(lambda x: x != '', words))
 
     fragment_short = ' ' + input.user_input[input.user_input.find(input.key) + len(input.key):] + ' '
@@ -23,15 +23,14 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
             candidates = [clean_word, single_word, reduced_word, word, dry_word]
 
             for candidate in candidates:
-                if candidate in fragment_short:
-                    if candidate not in answer_list:
+                if candidate.lower() in fragment_short.lower():
+                    if candidate.strip() not in answer_list:
                         answer_list.append(candidate.strip())
                         break
     final_answer = ''
     if len(answer_list)>0:
         final_answer = ' '.join(answer_list)
     input.value = final_answer.strip()
-
     return input
 '''
 def request_new_answer(input : Treatmentinput) -> Treatmentinput:
@@ -66,9 +65,11 @@ def entity_filter(input : Treatmentinput) -> Treatmentinput:
                 candidates.append(word.strip())
     candidates_str = ' '.join(candidates)
     tokens = token_classification_service(candidates_str)
+
     for token in tokens:
         if token['entity'] == 'NOUN':
             input.value = token['word']
+    
     return input
         
         
@@ -78,6 +79,7 @@ def extract_entity(input : Treatmentinput) -> Treatmentinput:
     for token in tokens:
         if token['entity'] == 'NOUN':
             input.value = token['word']
+            break
     return input
         
 def intent_filter(input : Treatmentinput) -> Treatmentinput:
@@ -89,3 +91,21 @@ def intent_filter(input : Treatmentinput) -> Treatmentinput:
             input.value = keyword
     return input
 
+def extract_attribute(input : Treatmentinput) -> Treatmentinput:
+    msg = input.user_input
+    attribute_index = msg.find(input.key) + len(input.key)
+    value = msg[attribute_index:]
+    if ' and ' in msg or ', ' in msg:
+        value_and = value.split(' and ')[0]
+        value_comma = value.split(', ')[0]
+        answer = []
+
+        for word in value_and:
+            if word in value_comma:
+                answer.append(word)
+
+        if len(answer)>0:
+            input.value = ' '.join(answer)
+            return input
+    input.value = value
+    return input

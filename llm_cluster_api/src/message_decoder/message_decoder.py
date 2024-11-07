@@ -154,7 +154,7 @@ class MessageDecoder:
 
                         attribute_key = token['word']
                         fragment_short_idx = self.user_msg.find(attribute_key)
-                        fragment_short = self.user_msg[fragment_short_idx + len(attribute_key)]
+                        fragment_short = self.user_msg[fragment_short_idx + len(attribute_key):]
 
                         find_attribute = QAService().make_call(inputs={
                                                                             "variables" : {
