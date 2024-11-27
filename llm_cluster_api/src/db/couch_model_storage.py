@@ -33,10 +33,7 @@ class CouchModelStorage:
         self.db = self.server[self.db_name]
         
     def get_rev_of(self, id : str) -> str:
-        mango = {
-                    "selector" : {'_id': id},
-                    "fields" : ["_rev"]
-                }
+        mango = { "selector" : {'_id': id}, "fields" : ["_rev"] }
 
         res = [dict(x).get("_rev", None) for x in list(self.db.find(mango))]
 
