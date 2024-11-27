@@ -1,3 +1,4 @@
+from src.exceptions.configuration_exception import ConfigurationException
 from src.exceptions.business_rule_exception import BusinessRuleException
 from src.llm.prompt_template import PromptTemplate
 from src.llm.prompt_line import PromptLine
@@ -17,11 +18,11 @@ class CouchModelStorage:
                  db_name = COUCHDB_DATABSE_NAME
                 ) -> None:
         if user is None:
-            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch username is mandatory")
+            raise ConfigurationException(detail="Specify the couch username is mandatory")
         if password is None:
-            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch password is mandatory")
+            raise ConfigurationException(detail="Specify the couch password is mandatory")
         if db_name is None:
-            raise BusinessRuleException(detail="Unexpected error", private=True, mask_detail="Specify the couch db name is mandatory")
+            raise ConfigurationException(detail="Specify the couch db name is mandatory")
         
         self.server = Server(url)
         self.server.resource.credentials = (user, password)

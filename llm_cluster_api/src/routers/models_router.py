@@ -7,18 +7,18 @@ from uuid import UUID
 from src.models.model import Model
 from src.models.query import Query
 
-from src.decorators.business_rule_exception_check import business_rule_exception_check
+from src.decorators.exception_check import exception_check
 from src.llm.qa_service import QAService
 
 models_router = APIRouter()
 
 @models_router.get('/models', tags=["Model" ])
-@business_rule_exception_check
+@exception_check
 def get_models():
         return CouchModelStorage().list_models()
 
 @models_router.get('/models/unregistered', tags=["Model" ])
-@business_rule_exception_check
+@exception_check
 def get_unregistered_models():
     all_models = []
 
@@ -32,20 +32,20 @@ def get_unregistered_models():
     return all_models
 
 @models_router.post('/models/get', tags=["Model" ])
-@business_rule_exception_check
+@exception_check
 def get_model(name : str):
     return CouchModelStorage().get_model(name).description()
 
 
 @models_router.post('/models/delete', tags=["Model" ])
-@business_rule_exception_check
+@exception_check
 def delete_model(name : str):
     if not CouchModelStorage().delete_model(name):
         raise HTTPException(status_code=404, detail=f"{name} is not a registered model")
     return "Ok"
 
 @models_router.post('/models', tags=["Model" ])
-@business_rule_exception_check
+@exception_check
 def post_model(model : Model):
     if LLMProviderStorage.get_provider_of(model.name).has_model(model.name):
         CouchModelStorage().add_model(model.to_LLModel())
@@ -54,13 +54,13 @@ def post_model(model : Model):
     raise HTTPException(status_code=400, detail=f"There is no support for the {model.name}")
 
 @models_router.put('/models', tags=["Model"])
-@business_rule_exception_check
+@exception_check
 def put_model(model : Model):
     CouchModelStorage().update_model(model.to_LLModel())
     return "Ok"
 
 @models_router.post('/models/query', tags=["Query"])
-@business_rule_exception_check
+@exception_check
 def query(name : str, prompt_input : Query):
         
     ans = QAService().make_call(

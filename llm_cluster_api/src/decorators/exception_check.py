@@ -1,13 +1,19 @@
 import functools
 from fastapi import HTTPException
 from src.exceptions.business_rule_exception import BusinessRuleException
+from src.exceptions.configuration_exception import ConfigurationException
 
 
-def business_rule_exception_check(func):
+def exception_check(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except ConfigurationException as e:
+            print(e.detail)
+            print("Shuting Down")
+            raise HTTPException(status_code=500, detail=e.mask_detail)
+
         except BusinessRuleException as e:
             if not e.private:
                 raise HTTPException(status_code=400, detail= e.detail)
