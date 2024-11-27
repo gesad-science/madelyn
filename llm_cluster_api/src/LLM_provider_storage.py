@@ -16,7 +16,6 @@ class LLMProviderStorage(ABC):
 
     __default = 'ollama'
 
-    # @staticmethod
     @classmethod
     def get_provider(cls, provider_name):
         return cls.__providers[provider_name]

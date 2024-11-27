@@ -1,8 +1,6 @@
 from src.exceptions.business_rule_exception import BusinessRuleException
 from src.llm.prompt_template import PromptTemplate
 from src.llm.prompt_line import PromptLine
-# from src.LLM_provider_storage import LLMProviderStorage
-# from src.utils.singleton import Singleton
 from src.llm.LLModel import LLModel
 from uuid import UUID
 from src.consts import COUCHDB_PASSWORD, COUCHDB_DATABSE_NAME, COUCHDB_URL, COUCHDB_USERNAME
@@ -124,8 +122,6 @@ class CouchModelStorage:
             raise BusinessRuleException(detail=f"{model.name} is already registered")
 
     def update_model(self, model : LLModel):
-        #TODO
-
         rev = self.get_rev_of(model.name)
         self.db.save(self.__LLModel_to_couch_doc(model, rev))
     

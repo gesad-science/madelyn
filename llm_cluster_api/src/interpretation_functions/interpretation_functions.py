@@ -39,14 +39,14 @@ class Interpretation_module:
     def get_intent(self):
         if self.tokens:
             '''
-            candidate = None
-            
-            for token in self.tokens:
-                if token['entity'] == 'VERB':
-                    candidate = token['word']
-                    break
-            
-            # send the first verb as a hint to the model
+                candidate = None
+                
+                for token in self.tokens:
+                    if token['entity'] == 'VERB':
+                        candidate = token['word']
+                        break
+                
+                # send the first verb as a hint to the model
             '''
             response = QAService().make_call(inputs={"variables" : {'user_msg' : self.user_msg}}, prompt_type=PromptType.INTENT, model=self.model)
             response = response['response']
@@ -74,28 +74,28 @@ class Interpretation_module:
     def get_entity(self):
         if self.tokens:
             '''
-            candidate = None
+                candidate = None
 
-            for token in self.tokens:
-                if token['entity'] == 'NOUN':
-                    candidate = token['word']
-                    break
-            
-            
-            # we will need some function to get the existing tables/entities, for that instance, as a list
-
-            entities = database.get_entities()
-
-
-            # and check if our nouns fits some existing entity
-
-            database_candidate = None
-
-            for token in self.tokens:
-                if token['entity'] == 'NOUN':
-                    if token['word'] in entities:
-                        database_candidate = token['word']
+                for token in self.tokens:
+                    if token['entity'] == 'NOUN':
+                        candidate = token['word']
                         break
+                
+                
+                # we will need some function to get the existing tables/entities, for that instance, as a list
+
+                entities = database.get_entities()
+
+
+                # and check if our nouns fits some existing entity
+
+                database_candidate = None
+
+                for token in self.tokens:
+                    if token['entity'] == 'NOUN':
+                        if token['word'] in entities:
+                            database_candidate = token['word']
+                            break
 
             '''
 
