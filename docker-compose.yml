@@ -12,31 +12,44 @@ services:
     restart: always
 
 
-  arangodb:
-    build:
-      context: ./llm_cluster_api
-      dockerfile: Dockerfile-DB
-    container_name: arangodb-instance
+  # arangodb:
+  #   build:
+  #     context: ./llm_cluster_api
+  #     dockerfile: Dockerfile-DB
+  #   container_name: arangodb-instance
+  #   ports:
+  #     - "8529:8529"
+  #   volumes:
+  #     - arangodb-data:/var/lib/arangodb3
+  #   restart: always
+
+  couchdb:
+    build: 
+      context: ./llm_cluster_api/docker
+      dockerfile: Dockerfile
+    container_name: madelyn-couchdb
     ports:
-      - "8529:8529"
+      - "5984:5984"
     volumes:
-      - arangodb-data:/var/lib/arangodb3
-    restart: always
+      - couchdb-data:/var/lib/couchdb
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=123
 
   llm_cluster:
     build: 
       context: ./llm_cluster_api
       dockerfile: Dockerfile-API
     environment:
-      - ARANGODB_URL=http://arangodb-instance:8529
-      - ARANGODB_USERNAME=root
+      - COUCHDB_URL=http://madelyn-couchdb:5984
+      - COUCHDB_USERNAME=admin
       - ARANGODB_PASSWORD=123
       - OLLAMA_BASE_URL=http://ollama:11434
 
     ports:
       - "8000:8000"
     depends_on:
-      - arangodb
+      - couchdb
       - ollama  
     restart: always
 
@@ -52,6 +65,6 @@ services:
       - "7000:7000"
     restart: always
 volumes: 
-  arangodb-data:
+  couchdb-data:
   ollama:
   
