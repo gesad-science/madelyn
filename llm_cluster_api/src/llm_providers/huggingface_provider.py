@@ -41,4 +41,6 @@ class HuggingFaceProvider(BaseProvider):
                         private=  True,
                         mask_detail="The server cant connect to the llm provider right now"
                     )
+    
+        return response.json()[0]['generated_text']
 
