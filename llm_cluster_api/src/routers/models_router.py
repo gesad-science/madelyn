@@ -22,7 +22,7 @@ def get_models():
 def get_unregistered_models():
     all_models = []
 
-    for provider in LLMProviderStorage.iter_providers():
+    for provider in LLMProviderStorage.list_provider():
         all_models += provider.list_models()
 
     print("Nothing")
