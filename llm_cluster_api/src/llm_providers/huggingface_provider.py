@@ -11,6 +11,7 @@ class HuggingFaceProvider(BaseProvider):
         self.models = models
         self.base_url = base_url
         self.token = token
+        
     def list_models(self) -> list[str]:
         return self.models
     
