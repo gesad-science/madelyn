@@ -1,11 +1,9 @@
 from src.exceptions.business_rule_exception import BusinessRuleException
-
+from src.consts import OLLAMA_MODELS
 from src.llm_providers.base_provider import BaseProvider
 import requests
 
-
 class OllamaProvider(BaseProvider):
-
 
     __MASK_ERROR__ = "The server cant connect to the llm provider right now"
 
@@ -24,12 +22,10 @@ class OllamaProvider(BaseProvider):
 
         print("pulling")
 
-        for model in [ 'mistral', 'llama3', 'phi3']:
+        for model in OLLAMA_MODELS:
             self.__pull_model(model)
 
         print("ended")
-
-
 
     def list_models(self) -> str:
         print("HAHAHA")
@@ -54,7 +50,14 @@ class OllamaProvider(BaseProvider):
         return False
 
     def make_call(self, prompt, model) -> str:
-        print(self.base_url)
+
+        if not self.has_model(model):
+            raise BusinessRuleException(
+                detail=f"Ollama provider do not support {model}",
+                private=True,
+                mask_detail="Unexpected internal Error"
+            )
+
         response = requests.post(self.base_url + '/api/generate',
                                 headers = { "Content-Type": "application/json" },
                                 json={

@@ -20,20 +20,24 @@ def get_models():
 @models_router.get('/models/unregistered', tags=["Model" ])
 @business_rule_exception_check
 def get_unregistered_models():
-    all_models = LLMProviderStorage.get_default_provider().list_models()
+    all_models = []
+
+    for provider in LLMProviderStorage.iter_providers():
+        all_models += provider.list_models()
+
     print("Nothing")
     for model in CouchModelStorage().list_models():
         if model in all_models:
             all_models.remove(model)
     return all_models
 
-@models_router.get('/models/{name}', tags=["Model" ])
+@models_router.post('/models/get', tags=["Model" ])
 @business_rule_exception_check
 def get_model(name : str):
     return CouchModelStorage().get_model(name).description()
 
 
-@models_router.delete('/models/{name}', tags=["Model" ])
+@models_router.post('/models/delete', tags=["Model" ])
 @business_rule_exception_check
 def delete_model(name : str):
     if not CouchModelStorage().delete_model(name):
@@ -43,7 +47,7 @@ def delete_model(name : str):
 @models_router.post('/models', tags=["Model" ])
 @business_rule_exception_check
 def post_model(model : Model):
-    if LLMProviderStorage.get_default_provider().has_model(model.name):
+    if LLMProviderStorage.get_provider_of(model.name).has_model(model.name):
         CouchModelStorage().add_model(model.to_LLModel())
         return "Ok"
 
@@ -55,7 +59,7 @@ def put_model(model : Model):
     CouchModelStorage().update_model(model.to_LLModel())
     return "Ok"
 
-@models_router.post('/models/{name}/query', tags=["Query"])
+@models_router.post('/models/query', tags=["Query"])
 @business_rule_exception_check
 def query(name : str, prompt_input : Query):
         

@@ -15,6 +15,6 @@ class QAService:
                 return {'error' : logs }
 
             return {
-                "response" : LLMProviderStorage.get_default_provider().make_call(prompt= prompt.apply_input(inputs),
+                "response" : LLMProviderStorage.get_provider_of(model.name).make_call(prompt= prompt.apply_input(inputs),
                                                                                     model=model.name)
             }
