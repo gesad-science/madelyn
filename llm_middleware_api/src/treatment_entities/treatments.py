@@ -15,12 +15,12 @@ def similarity_filter(input : Treatmentinput) -> Treatmentinput:
 
     for word in words: # assembling the answer
         if len(word)>0 and word != '=':
-
+            
             clean_word = ' ' + word[1:-1].replace('\n', '') + ' '
             single_word = ' ' + word.replace('\n', '') + ' '
             reduced_word = ' ' + word[1:-1] + ' '
             dry_word = ' ' + clean_string(word) + ' '
-            candidates = [clean_word, single_word, reduced_word, word, dry_word]
+            candidates = [clean_word, single_word, reduced_word, ' ' + word + ' ', dry_word]    
 
             for candidate in candidates:
                 if candidate.lower() in fragment_short.lower():
@@ -95,17 +95,21 @@ def extract_attribute(input : Treatmentinput) -> Treatmentinput:
     msg = input.user_input
     attribute_index = msg.find(input.key) + len(input.key)
     value = msg[attribute_index:]
-    if ' and ' in msg or ', ' in msg:
-        value_and = value.split(' and ')[0]
-        value_comma = value.split(', ')[0]
-        answer = []
+    if ' and ' in msg:
+        value_fragment = value.split(' and ')[0]
+    elif ', ' in msg:
+        value_fragment = value.split(', ')[0]
+    else:
+        input.value = value
+        return input
+    
+    answer = []
+    value_list = value_fragment.split(' ')
 
-        for word in value_and:
-            if word in value_comma:
-                answer.append(word)
+    for word in value_list:
+        if word in value:
+            answer.append(word)
 
-        if len(answer)>0:
-            input.value = ' '.join(answer)
-            return input
-    input.value = value
-    return input
+    if len(answer)>0:
+        input.value = ' '.join(answer)
+        return input

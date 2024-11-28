@@ -27,6 +27,7 @@ class MessageDecoder:
         self.tokens = self.generate_tokens_classification()
 
         self.attributes = {}
+        self.filters = {}
         self.intent = self.get_intent()
         self.entity = self.get_entity()
         self.get_attributes()
@@ -174,9 +175,27 @@ class MessageDecoder:
                 else:
                     if token['word'] == find_attribute:
                         find_attribute = None
+            
+            if self.intent == 'update':
+                
+                for key in self.attributes.keys():
 
+                    find_filter = QAService().make_call(inputs={
+                        "variables" : {
+                            "user_msg" : self.user_msg,
+                            "candidate" : key
+                        }
+                    },
+                    prompt_type=PromptType.FILTER, model=self.model
+                    )
+                    find_filter = self.call_lim(request='filter', attribute_key=find_filter, value='')['value']
+
+                    if find_filter=='yes':
+                        self.filters[key] = self.attributes[key]
+                        self.attributes.pop(key)
         else:
             return None
         
+        
     def extract_data(self):
-        return {'user_msg' : self.user_msg, 'intent' : self.intent, 'entity' : self.entity, 'attributes' : self.attributes}
+        return {'user_msg' : self.user_msg, 'intent' : self.intent, 'entity' : self.entity, 'attributes' : self.attributes, 'filters' : self.filters}

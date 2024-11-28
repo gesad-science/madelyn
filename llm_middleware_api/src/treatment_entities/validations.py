@@ -137,7 +137,7 @@ def char_test(input : Treatmentinput) -> bool: # should be increased in the futu
 
 
 def in_msg_test(input : Treatmentinput) -> bool:
-    single_word = ' ' + input.value + ' '
+    single_word = ' ' + input.value 
     message = ' ' + input.user_input.lower() + ' '
     if single_word.lower() in message:
         return True
