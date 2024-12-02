@@ -115,14 +115,10 @@ def extract_attribute(input : Treatmentinput) -> Treatmentinput:
         return input
 
 def find_filter(input : Treatmentinput) -> Treatmentinput:
-    print("findf")
     options = input.processed_atts.keys()
     answers = []
     for option in options:
-        print(option)
         if option in input.key:
-            print("apendou")
             answers.append(option)
     input.value = ' '.join(answers)
-    print(input.value)
     return input

@@ -185,12 +185,9 @@ class MessageDecoder:
             return None
     
     def get_filters(self):
-        print("qqqqqqqqqqaaaaaaaaaaaaaaaaaaaaaaa")
-        print(self.intent)
         if self.intent == 'Intent.UPDATE':
             keys = self.attributes.keys()
             keys_str = ', '.join(keys)
-            print(keys_str)
             find_filter = QAService().make_call(inputs={
                 "variables" : {
                     "entity" : self.entity,
@@ -200,14 +197,8 @@ class MessageDecoder:
             },
             prompt_type=PromptType.FILTER, model=self.model
             )
-            print("filter")
-            print(find_filter)
-            print("attribute")
-            print(self.attributes)
             find_filter = find_filter['response']
             find_filter = self.call_lim(request='filter', attribute_key=find_filter, value='')['value']
-            print("lim")
-            print(find_filter)
             filters_list = find_filter.split(' ')
             for word in filters_list:
                 self.filters[word] = self.attributes[word]
