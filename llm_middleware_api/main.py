@@ -16,7 +16,7 @@ def get_new_answer_intent(input : Treatmentinput):
 def get_new_answer_entity(input : Treatmentinput):
     return TreatmentCenter.run_line(line_name='entity_pipeline', input=input)
 
-@app.post('/treat/filter', tags="Treatment")
+@app.post('/treat/filters', tags="Treatment")
 def get_new_answer_entity(input : Treatmentinput):
     return TreatmentCenter.run_line(line_name='filter_pipeline', input=input)
 

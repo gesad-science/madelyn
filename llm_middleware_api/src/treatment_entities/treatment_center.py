@@ -32,7 +32,8 @@ class TreatmentCenter:
     mandatory_treatments : list[Treatment] = [
         Treatment(name='similarity_filter', description='This treatment gets the interception between the response from the model and the user input', operation=similarity_filter),
         Treatment(name='entity_filter', description='This treatment gets the first interception between the response from the model and the user input. it returns a single word as response', operation=entity_filter),
-        Treatment(name='intent_filter', description='Extracts the exact intent string from the model response', operation=intent_filter)
+        Treatment(name='intent_filter', description='Extracts the exact intent string from the model response', operation=intent_filter),
+        Treatment(name='filter_filter', description='Searchs for an processed attribute key in the model response', operation=find_filter)
     ]
 
     """ 
@@ -53,7 +54,8 @@ class TreatmentCenter:
     # mandatory treatments, regular treatments and validations
     treatment_lines : dict[str, tuple[ list[Treatment], list[Treatment], list[PromptValidation]  ]] = {'attributes_pipeline' : ([mandatory_treatments[0]],[treatments[1]],PromptValidationCenter.PromptValidations),
                                                                                       'entity_pipeline' : ([mandatory_treatments[1]], [treatments[0]], [PromptValidationCenter.PromptValidations[0],PromptValidationCenter.PromptValidations[9]]),
-                                                                                      'intent_pipeline' : ([mandatory_treatments[2]], [], [])
+                                                                                      'intent_pipeline' : ([mandatory_treatments[2]], [], []),
+                                                                                      'filter_pipeline' : ([mandatory_treatments[3]], [], [])
                                                                                       }
     '''
     @classmethod

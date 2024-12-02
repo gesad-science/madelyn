@@ -63,9 +63,9 @@ models = [
     },
     "filter": { 
         "default_prompt": {
-        "template": "Considering the follow user's message: '{user_msg}'. In that user's message, what type of '{entity}' must be updated? Give me the answer as a exact subsentence of the user's message. You must consider that the user's message is an SQL dialect near natural human language. Your answer must include at least one noun that corresponds to the filter's field name and one expression (one or more words) that corresponds to the field's value. So, complete to me: Update '{entity}' for all '{entity}' with ?",
+        "template": "Considering the follow user's message: '{user_msg}'. In that user's message, what type of '{entity}' must be updated? Give me the answer as a exact subsentence of the user's message. You must consider that the user's message is an SQL dialect near natural human language. Your answer must include at least one noun that corresponds to the filter's field name and one expression (one or more words) that corresponds to the field's value. So, complete to me: Update '{entity}' for all '{entity}' with ?, Options: {options}",
         "args": {
-            "variables" : ["entity", "user_msg"]
+            "variables" : ["entity", "user_msg", "options"]
         }
         }, 
         "prompt_alternatives": []

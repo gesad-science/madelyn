@@ -31,6 +31,7 @@ class MessageDecoder:
         self.intent = self.get_intent()
         self.entity = self.get_entity()
         self.get_attributes()
+        self.get_filters()
 
     def generate_tokens_classification(self):
         data = {
@@ -60,6 +61,10 @@ class MessageDecoder:
                 data['current_intent'] = self.intent.__str__()
             case 'attribute':
                 url = LIM_API_URL + '/attributes'
+                data['current_intent'] = self.intent
+                data['current_entity'] = self.entity
+            case 'filter':
+                url = LIM_API_URL + '/filters'
                 data['current_intent'] = self.intent
                 data['current_entity'] = self.entity
         response = requests.post(url, json=data)
@@ -175,27 +180,38 @@ class MessageDecoder:
                 else:
                     if token['word'] == find_attribute:
                         find_attribute = None
-            
-            if self.intent == 'update':
-                
-                for key in self.attributes.keys():
-
-                    find_filter = QAService().make_call(inputs={
-                        "variables" : {
-                            "user_msg" : self.user_msg,
-                            "candidate" : key
-                        }
-                    },
-                    prompt_type=PromptType.FILTER, model=self.model
-                    )
-                    find_filter = self.call_lim(request='filter', attribute_key=find_filter, value='')['value']
-
-                    if find_filter=='yes':
-                        self.filters[key] = self.attributes[key]
-                        self.attributes.pop(key)
         else:
+            #error
             return None
-        
+    
+    def get_filters(self):
+        print("qqqqqqqqqqaaaaaaaaaaaaaaaaaaaaaaa")
+        print(self.intent)
+        if self.intent == 'Intent.UPDATE':
+            keys = self.attributes.keys()
+            keys_str = ', '.join(keys)
+            print(keys_str)
+            find_filter = QAService().make_call(inputs={
+                "variables" : {
+                    "entity" : self.entity,
+                    "user_msg" : self.user_msg,
+                    "options" : keys_str
+                }
+            },
+            prompt_type=PromptType.FILTER, model=self.model
+            )
+            print("filter")
+            print(find_filter)
+            print("attribute")
+            print(self.attributes)
+            find_filter = find_filter['response']
+            find_filter = self.call_lim(request='filter', attribute_key=find_filter, value='')['value']
+            print("lim")
+            print(find_filter)
+            filters_list = find_filter.split(' ')
+            for word in filters_list:
+                self.filters[word] = self.attributes[word]
+                self.attributes.pop(word)
         
     def extract_data(self):
         return {'user_msg' : self.user_msg, 'intent' : self.intent, 'entity' : self.entity, 'attributes' : self.attributes, 'filters' : self.filters}
