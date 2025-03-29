@@ -13,7 +13,6 @@ tags_metadata = [
 ]
 
 app = FastAPI(openapi_tags=tags_metadata)
-# app.include_router(verificationm_router)
 app.include_router(prompts_router)
 app.include_router(models_router)
 app.include_router(validations_router)
@@ -21,11 +20,6 @@ app.include_router(validations_router)
 
 """
 
-    TODO:   
-        - Data verifications over paramethers passed from body | OK
-
-        - Assert validation numbers to be in the correct range (for delete and post endpoints) | OK 
-
-        - Adjust redundancy in query endpoint | OK
+    TODO:
 
 """

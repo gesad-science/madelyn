@@ -6,7 +6,6 @@ from src.exceptions.business_rule_exception import BusinessRuleException
 class ModelStorage(ABC):
     __models : list[LLModel] = []
 
-    # @staticmethod
     @classmethod
     def get_model(cls, name : str ) -> LLModel:
         for model in cls.__models:
@@ -14,7 +13,6 @@ class ModelStorage(ABC):
                 return model
         raise BusinessRuleException(detail=f"{name} is not a registered model")
         
-    
     @classmethod
     def delete_model(cls, name):
         for index , model in enumerate(cls.__models):
